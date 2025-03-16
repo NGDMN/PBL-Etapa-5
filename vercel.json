@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "outputDirectory": "portal-apoio-vite/dist",
+  "buildCommand": "cd portal-apoio-vite && npm install && npm run build",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+} 
