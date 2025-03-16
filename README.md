@@ -80,8 +80,7 @@ npm run dev
 
 ## 👥 Autores
 
-- [Seu Nome]
+- Neil Goodman 
 
-## 📝 Licença
 
-Este projeto está sob a licença [MIT](https://choosealicense.com/licenses/mit/)
+
