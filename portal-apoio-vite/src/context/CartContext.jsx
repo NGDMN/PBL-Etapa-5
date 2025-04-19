@@ -8,7 +8,6 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [purchasedItems, setPurchasedItems] = useState([]);
   const { user } = useAuth();
 
   // Get cart key based on user authentication
@@ -16,40 +15,22 @@ export const CartProvider = ({ children }) => {
     return user ? `cart_${user.id}` : 'cart_guest';
   };
 
-  // Get purchased items key based on user authentication
-  const getPurchasedItemsKey = () => {
-    return user ? `purchased_${user.id}` : null;
-  };
-
   // Load cart from localStorage
   useEffect(() => {
     const cartKey = getCartKey();
-    const purchasedKey = getPurchasedItemsKey();
     const savedCart = localStorage.getItem(cartKey);
-    const savedPurchased = purchasedKey ? localStorage.getItem(purchasedKey) : null;
-    
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
     } else {
       setCartItems([]);
     }
-
-    if (savedPurchased) {
-      setPurchasedItems(JSON.parse(savedPurchased));
-    } else {
-      setPurchasedItems([]);
-    }
-  }, [user]);
+  }, [user]); // Reload cart when user changes
 
   // Save cart to localStorage
   useEffect(() => {
     const cartKey = getCartKey();
-    const purchasedKey = getPurchasedItemsKey();
     localStorage.setItem(cartKey, JSON.stringify(cartItems));
-    if (purchasedKey) {
-      localStorage.setItem(purchasedKey, JSON.stringify(purchasedItems));
-    }
-  }, [cartItems, purchasedItems, user]);
+  }, [cartItems, user]);
 
   const addToCart = (product, quantity = 1) => {
     if (!user) {
@@ -65,6 +46,7 @@ export const CartProvider = ({ children }) => {
     setCartItems(prev => {
       const existingItem = prev.find(item => item.id === product.id);
       if (existingItem) {
+        // Verificar estoque
         if (existingItem.quantity + quantity > product.stock) {
           toast.error('Quantidade excede o estoque disponível');
           return prev;
@@ -121,14 +103,8 @@ export const CartProvider = ({ children }) => {
       setIsLoginModalOpen(true);
       return;
     }
-    // Add items to purchased items
-    setPurchasedItems(prev => [...prev, ...cartItems]);
+    // Processo de checkout
     clearCart();
-    toast.success('Compra realizada com sucesso!');
-  };
-
-  const hasPurchasedItem = (productId) => {
-    return purchasedItems.some(item => item.id === productId);
   };
 
   return (
@@ -144,8 +120,7 @@ export const CartProvider = ({ children }) => {
       getCartTotal,
       getCartCount,
       clearCart,
-      checkout,
-      hasPurchasedItem
+      checkout
     }}>
       {children}
     </CartContext.Provider>

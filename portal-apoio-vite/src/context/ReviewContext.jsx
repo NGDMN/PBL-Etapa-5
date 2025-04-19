@@ -26,20 +26,8 @@ export const ReviewProvider = ({ children }) => {
     return reviews.filter(review => review.productId === productId);
   };
 
-  const getAverageRating = (productId) => {
-    const productReviews = getProductReviews(productId);
-    if (productReviews.length === 0) return 0;
-    const sum = productReviews.reduce((total, review) => total + review.rating, 0);
-    return sum / productReviews.length;
-  };
-
   return (
-    <ReviewContext.Provider value={{
-      reviews,
-      addReview,
-      getProductReviews,
-      getAverageRating
-    }}>
+    <ReviewContext.Provider value={{ reviews, addReview, getProductReviews }}>
       {children}
     </ReviewContext.Provider>
   );

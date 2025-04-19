@@ -1,94 +1,78 @@
 import React, { useState } from 'react';
-import { Card, Modal } from 'react-bootstrap';
 import { useCart } from '../context/CartContext';
 import { useReview } from '../context/ReviewContext';
-import ReviewForm from './ReviewForm';
-import ReviewsList from './ReviewsList';
+import Review from './Review';
+import { FaStar } from 'react-icons/fa';
 
 const ProductCard = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
-  const [showReviews, setShowReviews] = useState(false);
-  const { addToCart, hasPurchasedItem } = useCart();
-  const { getProductReviews, addReview, getAverageRating } = useReview();
+  const { addToCart } = useCart();
+  const { getProductReviews } = useReview();
   const reviews = getProductReviews(product.id);
-  const averageRating = getAverageRating(product.id);
 
-  const handleReviewSubmit = (review) => {
-    addReview(review);
-  };
+  const averageRating = reviews.length > 0
+    ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
+    : 0;
 
   return (
-    <>
-      <Card className="h-100">
-        <Card.Img
-          variant="top"
-          src={product.image}
-          alt={product.name}
-          style={{ height: '200px', objectFit: 'cover' }}
-        />
-        <Card.Body className="d-flex flex-column">
-          <Card.Title>{product.name}</Card.Title>
-          <Card.Text>{product.description}</Card.Text>
-          <Card.Text>R$ {product.price.toFixed(2)}</Card.Text>
-          {averageRating > 0 && (
-            <div className="mb-2">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <i
-                  key={star}
-                  className={`bi bi-star${star <= averageRating ? '-fill' : ''}`}
-                  style={{ color: star <= averageRating ? '#ffc107' : '#6c757d' }}
-                />
-              ))}
-              <small className="text-muted ms-2">
-                ({reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'})
-              </small>
-            </div>
-          )}
-          <div className="mt-auto">
-            <div className="input-group mb-3">
-              <input
-                type="number"
-                className="form-control"
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                min="1"
-                max={product.stock}
+    <div className="card h-100">
+      <img
+        src={product.image}
+        className="card-img-top"
+        alt={product.name}
+        style={{ height: '200px', objectFit: 'cover' }}
+      />
+      <div className="card-body d-flex flex-column">
+        <h5 className="card-title">{product.name}</h5>
+        <p className="card-text">{product.description}</p>
+        <p className="card-text">R$ {product.price.toFixed(2)}</p>
+        
+        {/* Rating display */}
+        <div className="mb-2">
+          <div className="d-flex align-items-center">
+            {[...Array(5)].map((_, i) => (
+              <FaStar
+                key={i}
+                color={i < Math.round(averageRating) ? '#ffc107' : '#e4e5e9'}
+                size={20}
               />
-              <button
-                className="btn btn-primary"
-                onClick={() => addToCart(product, quantity)}
-              >
-                Adicionar ao Carrinho
-              </button>
-            </div>
-            <small className="text-muted">Estoque: {product.stock}</small>
-            <div className="mt-2">
-              <button
-                className="btn btn-outline-secondary btn-sm"
-                onClick={() => setShowReviews(true)}
-              >
-                Ver Avaliações
-              </button>
-            </div>
+            ))}
+            <span className="ms-2">
+              ({reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'})
+            </span>
           </div>
-        </Card.Body>
-      </Card>
+        </div>
 
-      <Modal show={showReviews} onHide={() => setShowReviews(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Avaliações - {product.name}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ReviewsList reviews={reviews} />
-          {hasPurchasedItem(product.id) && (
-            <ReviewForm
-              productId={product.id}
-              onSubmit={handleReviewSubmit}
+        <div className="mt-auto">
+          <div className="input-group mb-3">
+            <input
+              type="number"
+              className="form-control"
+              value={quantity}
+              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              min="1"
+              max={product.stock}
             />
-          )}
-        </Modal.Body>
-      </Modal>
-    </>
+            <button
+              className="btn btn-primary"
+              onClick={() => addToCart(product, quantity)}
+            >
+              Adicionar ao Carrinho
+            </button>
+          </div>
+          <small className="text-muted">Estoque: {product.stock}</small>
+        </div>
+
+        {/* Reviews section */}
+        <Review 
+          productId={product.id}
+          reviews={reviews}
+          onAddReview={(review) => {
+            // This will be handled by the ReviewContext
+          }}
+        />
+      </div>
+    </div>
   );
 };
 
