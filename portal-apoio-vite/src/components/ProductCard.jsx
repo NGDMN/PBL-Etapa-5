@@ -7,7 +7,7 @@ import { FaStar } from 'react-icons/fa';
 const ProductCard = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
-  const { getProductReviews } = useReview();
+  const { getProductReviews, addReview } = useReview();
   const reviews = getProductReviews(product.id);
 
   const averageRating = reviews.length > 0
@@ -67,9 +67,7 @@ const ProductCard = ({ product }) => {
         <Review 
           productId={product.id}
           reviews={reviews}
-          onAddReview={(review) => {
-            // This will be handled by the ReviewContext
-          }}
+          onAddReview={addReview}
         />
       </div>
     </div>
