@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -7,19 +8,55 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [purchasedItems, setPurchasedItems] = useState([]);
+  const { user } = useAuth();
 
-  // Carregar carrinho do localStorage
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) setCartItems(JSON.parse(savedCart));
-  }, []);
+  // Get cart key based on user authentication
+  const getCartKey = () => {
+    return user ? `cart_${user.id}` : 'cart_guest';
+  };
 
-  // Salvar carrinho no localStorage
+  // Get purchased items key based on user authentication
+  const getPurchasedItemsKey = () => {
+    return user ? `purchased_${user.id}` : null;
+  };
+
+  // Load cart from localStorage
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    const cartKey = getCartKey();
+    const purchasedKey = getPurchasedItemsKey();
+    const savedCart = localStorage.getItem(cartKey);
+    const savedPurchased = purchasedKey ? localStorage.getItem(purchasedKey) : null;
+    
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+    } else {
+      setCartItems([]);
+    }
+
+    if (savedPurchased) {
+      setPurchasedItems(JSON.parse(savedPurchased));
+    } else {
+      setPurchasedItems([]);
+    }
+  }, [user]);
+
+  // Save cart to localStorage
+  useEffect(() => {
+    const cartKey = getCartKey();
+    const purchasedKey = getPurchasedItemsKey();
+    localStorage.setItem(cartKey, JSON.stringify(cartItems));
+    if (purchasedKey) {
+      localStorage.setItem(purchasedKey, JSON.stringify(purchasedItems));
+    }
+  }, [cartItems, purchasedItems, user]);
 
   const addToCart = (product, quantity = 1) => {
+    if (!user) {
+      setIsLoginModalOpen(true);
+      return;
+    }
+
     if (quantity <= 0) {
       toast.error('Quantidade inválida');
       return;
@@ -28,7 +65,6 @@ export const CartProvider = ({ children }) => {
     setCartItems(prev => {
       const existingItem = prev.find(item => item.id === product.id);
       if (existingItem) {
-        // Verificar estoque
         if (existingItem.quantity + quantity > product.stock) {
           toast.error('Quantidade excede o estoque disponível');
           return prev;
@@ -81,14 +117,18 @@ export const CartProvider = ({ children }) => {
   };
 
   const checkout = () => {
-    // Verificar se usuário está logado (simulação)
-    const isLoggedIn = false; // Substituir pela sua lógica de autenticação
-    if (!isLoggedIn) {
+    if (!user) {
       setIsLoginModalOpen(true);
       return;
     }
-    // Processo de checkout
+    // Add items to purchased items
+    setPurchasedItems(prev => [...prev, ...cartItems]);
     clearCart();
+    toast.success('Compra realizada com sucesso!');
+  };
+
+  const hasPurchasedItem = (productId) => {
+    return purchasedItems.some(item => item.id === productId);
   };
 
   return (
@@ -104,7 +144,8 @@ export const CartProvider = ({ children }) => {
       getCartTotal,
       getCartCount,
       clearCart,
-      checkout
+      checkout,
+      hasPurchasedItem
     }}>
       {children}
     </CartContext.Provider>

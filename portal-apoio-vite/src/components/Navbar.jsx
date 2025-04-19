@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CartIcon from './CartIcon';
+import LoginForm from './LoginForm';
+import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
+  const [showLogin, setShowLogin] = useState(false);
+  const { user, logout } = useAuth();
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark fixed-top">
       <div className="container">
@@ -36,12 +41,29 @@ const Navbar = () => {
           <div className="d-flex align-items-center">
             <CartIcon />
             <div className="ms-3">
-              <Link to="/login" className="btn btn-outline-light me-2">Login</Link>
-              <Link to="/cadastro" className="btn btn-outline-light">Cadastro</Link>
+              {user ? (
+                <div className="d-flex align-items-center">
+                  <span className="text-light me-2">Olá, {user.name}</span>
+                  <button 
+                    className="btn btn-outline-light" 
+                    onClick={logout}
+                  >
+                    Sair
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  className="btn btn-outline-light" 
+                  onClick={() => setShowLogin(true)}
+                >
+                  Login
+                </button>
+              )}
             </div>
           </div>
         </div>
       </div>
+      <LoginForm show={showLogin} onHide={() => setShowLogin(false)} />
     </nav>
   );
 };

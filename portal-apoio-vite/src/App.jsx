@@ -8,26 +8,32 @@ import Contact from './pages/Contact';
 import Marketplace from './pages/Marketplace';
 import Training from './pages/Training';
 import { CartProvider } from './context/CartContext';
+import { AuthProvider } from './context/AuthContext';
+import { ReviewProvider } from './context/ReviewContext';
 import './styles/styles.css';
 
 function App() {
   return (
     <Router>
-      <CartProvider>
-        <div className="App">
-          <Navbar />
-          <main className="container flex-grow-1">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/sobre" element={<About />} />
-              <Route path="/contato" element={<Contact />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/treinamentos" element={<Training />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <ReviewProvider>
+            <div className="App">
+              <Navbar />
+              <main className="container flex-grow-1">
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/sobre" element={<About />} />
+                  <Route path="/contato" element={<Contact />} />
+                  <Route path="/marketplace" element={<Marketplace />} />
+                  <Route path="/treinamentos" element={<Training />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </ReviewProvider>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   );
 }
