@@ -48,6 +48,7 @@ const RegisterForm = ({ onSubmit, error }) => {
         username: formData.username,
         email: formData.email,
         password: formData.password,
+        password2: formData.confirmPassword,
         first_name: formData.firstName,
         last_name: formData.lastName,
       });
