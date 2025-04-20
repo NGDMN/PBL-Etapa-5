@@ -1,33 +1,45 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { reviews } from '../services/api';
 
 const ReviewContext = createContext();
 
 export const ReviewProvider = ({ children }) => {
-  const [reviews, setReviews] = useState([]);
+  const [productReviews, setProductReviews] = useState({});
 
-  // Load reviews from localStorage
-  useEffect(() => {
-    const savedReviews = localStorage.getItem('reviews');
-    if (savedReviews) {
-      setReviews(JSON.parse(savedReviews));
+  const getProductReviews = async (productId) => {
+    try {
+      const response = await reviews.getByProduct(productId);
+      setProductReviews(prev => ({
+        ...prev,
+        [productId]: response
+      }));
+      return response;
+    } catch (error) {
+      console.error('Erro ao carregar avaliações:', error);
+      return [];
     }
-  }, []);
-
-  // Save reviews to localStorage
-  useEffect(() => {
-    localStorage.setItem('reviews', JSON.stringify(reviews));
-  }, [reviews]);
-
-  const addReview = (review) => {
-    setReviews(prev => [...prev, review]);
   };
 
-  const getProductReviews = (productId) => {
-    return reviews.filter(review => review.productId === productId);
+  const addReview = async (productId, reviewData) => {
+    try {
+      const response = await reviews.create(productId, reviewData);
+      setProductReviews(prev => ({
+        ...prev,
+        [productId]: [...(prev[productId] || []), response]
+      }));
+      return response;
+    } catch (error) {
+      console.error('Erro ao adicionar avaliação:', error);
+      throw error;
+    }
   };
 
   return (
-    <ReviewContext.Provider value={{ reviews, addReview, getProductReviews }}>
+    <ReviewContext.Provider value={{
+      productReviews,
+      getProductReviews,
+      addReview
+    }}>
       {children}
     </ReviewContext.Provider>
   );

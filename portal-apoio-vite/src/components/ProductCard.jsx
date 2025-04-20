@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useReview } from '../context/ReviewContext';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
 import Review from './Review';
 import { FaStar } from 'react-icons/fa';
 
@@ -8,11 +10,58 @@ const ProductCard = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { getProductReviews, addReview } = useReview();
-  const reviews = getProductReviews(product.id);
+  const { user } = useAuth();
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
 
   const averageRating = reviews.length > 0
     ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
     : 0;
+
+  const handleAddToCart = async () => {
+    try {
+      setLoading(true);
+      await addToCart(product, quantity);
+      toast.success('Produto adicionado ao carrinho!');
+    } catch (error) {
+      toast.error('Erro ao adicionar produto ao carrinho');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddReview = async (reviewData) => {
+    if (!user) {
+      toast.error('Você precisa estar logado para avaliar produtos');
+      return;
+    }
+
+    try {
+      setReviewLoading(true);
+      await addReview(product.id, reviewData);
+      toast.success('Avaliação adicionada com sucesso!');
+      // Recarrega as avaliações
+      const updatedReviews = await getProductReviews(product.id);
+      setReviews(updatedReviews);
+    } catch (error) {
+      toast.error('Erro ao adicionar avaliação');
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  const loadReviews = async () => {
+    try {
+      setLoading(true);
+      const productReviews = await getProductReviews(product.id);
+      setReviews(productReviews);
+    } catch (error) {
+      console.error('Erro ao carregar avaliações:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="card h-100">
@@ -55,9 +104,10 @@ const ProductCard = ({ product }) => {
             />
             <button
               className="btn btn-primary"
-              onClick={() => addToCart(product, quantity)}
+              onClick={handleAddToCart}
+              disabled={loading}
             >
-              Adicionar ao Carrinho
+              {loading ? 'Adicionando...' : 'Adicionar ao Carrinho'}
             </button>
           </div>
           <small className="text-muted">Estoque: {product.stock}</small>
@@ -67,7 +117,7 @@ const ProductCard = ({ product }) => {
         <Review 
           productId={product.id}
           reviews={reviews}
-          onAddReview={addReview}
+          onAddReview={handleAddReview}
         />
       </div>
     </div>

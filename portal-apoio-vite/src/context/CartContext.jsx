@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useAuth } from './AuthContext';
+import { cart } from '../services/api';
 
 const CartContext = createContext();
 
@@ -10,29 +11,25 @@ export const CartProvider = ({ children }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { user } = useAuth();
 
-  // Get cart key based on user authentication
-  const getCartKey = () => {
-    return user ? `cart_${user.id}` : 'cart_guest';
-  };
-
-  // Load cart from localStorage
+  // Load cart from backend
   useEffect(() => {
-    const cartKey = getCartKey();
-    const savedCart = localStorage.getItem(cartKey);
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
-    } else {
-      setCartItems([]);
-    }
-  }, [user]); // Reload cart when user changes
+    const loadCart = async () => {
+      if (user) {
+        try {
+          const cartData = await cart.getCart();
+          setCartItems(cartData.items || []);
+        } catch (error) {
+          console.error('Erro ao carregar carrinho:', error);
+        }
+      } else {
+        setCartItems([]);
+      }
+    };
 
-  // Save cart to localStorage
-  useEffect(() => {
-    const cartKey = getCartKey();
-    localStorage.setItem(cartKey, JSON.stringify(cartItems));
-  }, [cartItems, user]);
+    loadCart();
+  }, [user]);
 
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = async (product, quantity = 1) => {
     if (!user) {
       setIsLoginModalOpen(true);
       return;
@@ -43,50 +40,77 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id);
-      if (existingItem) {
-        // Verificar estoque
-        if (existingItem.quantity + quantity > product.stock) {
-          toast.error('Quantidade excede o estoque disponível');
-          return prev;
+    try {
+      const cartData = await cart.getCart();
+      await cart.addItem(cartData.id, product.id, quantity);
+      
+      // Atualiza o estado local
+      setCartItems(prev => {
+        const existingItem = prev.find(item => item.product.id === product.id);
+        if (existingItem) {
+          return prev.map(item =>
+            item.product.id === product.id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          );
         }
-        return prev.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
+        return [...prev, { product, quantity }];
+      });
+
       toast.success('Produto adicionado ao carrinho');
-      return [...prev, { ...product, quantity }];
-    });
+    } catch (error) {
+      toast.error(error.response?.data?.error || 'Erro ao adicionar ao carrinho');
+    }
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems(prev => prev.filter(item => item.id !== productId));
-    toast.success('Produto removido do carrinho');
+  const removeFromCart = async (productId) => {
+    if (!user) return;
+
+    try {
+      const cartData = await cart.getCart();
+      await cart.removeItem(cartData.id, productId, 1);
+      
+      setCartItems(prev => prev.filter(item => item.product.id !== productId));
+      toast.success('Produto removido do carrinho');
+    } catch (error) {
+      toast.error('Erro ao remover do carrinho');
+    }
   };
 
-  const updateQuantity = (productId, newQuantity) => {
+  const updateQuantity = async (productId, newQuantity) => {
+    if (!user) return;
+
     if (newQuantity <= 0) {
       removeFromCart(productId);
       return;
     }
 
-    setCartItems(prev => prev.map(item => {
-      if (item.id === productId) {
-        if (newQuantity > item.stock) {
-          toast.error('Quantidade excede o estoque disponível');
-          return item;
-        }
-        return { ...item, quantity: newQuantity };
+    try {
+      const cartData = await cart.getCart();
+      const currentItem = cartItems.find(item => item.product.id === productId);
+      const quantityDiff = newQuantity - currentItem.quantity;
+
+      if (quantityDiff > 0) {
+        await cart.addItem(cartData.id, productId, quantityDiff);
+      } else {
+        await cart.removeItem(cartData.id, productId, -quantityDiff);
       }
-      return item;
-    }));
+
+      setCartItems(prev => prev.map(item => {
+        if (item.product.id === productId) {
+          return { ...item, quantity: newQuantity };
+        }
+        return item;
+      }));
+    } catch (error) {
+      toast.error('Erro ao atualizar quantidade');
+    }
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cartItems.reduce((total, item) => 
+      total + (item.product.price * item.quantity), 0
+    );
   };
 
   const getCartCount = () => {
@@ -103,7 +127,7 @@ export const CartProvider = ({ children }) => {
       setIsLoginModalOpen(true);
       return;
     }
-    // Processo de checkout
+    // Implementar checkout
     clearCart();
   };
 
