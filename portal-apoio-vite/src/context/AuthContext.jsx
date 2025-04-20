@@ -39,7 +39,8 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       return true;
     } catch (err) {
-      setError(err.response?.data?.message || 'Erro ao criar conta');
+      console.error('Erro no registro:', err.response?.data);
+      setError(err.response?.data?.message || 'Erro ao criar conta. Por favor, tente novamente.');
       return false;
     }
   };
