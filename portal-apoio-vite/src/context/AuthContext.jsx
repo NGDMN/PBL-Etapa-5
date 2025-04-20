@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 // URL do backend baseada no ambiente
 const API_URL = import.meta.env.PROD 
-  ? 'https://seu-backend.vercel.app/api'  // URL do backend em produção
+  ? '/api'  // Em produção, usa o path relativo pois está no mesmo domínio
   : 'http://localhost:8000/api';
 
 export const AuthProvider = ({ children }) => {

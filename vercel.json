@@ -1,9 +1,36 @@
 {
   "version": 2,
-  "outputDirectory": "portal-apoio-vite/dist",
-  "buildCommand": "cd portal-apoio-vite && npm install && npm run build",
-  "framework": "vite",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "builds": [
+    {
+      "src": "backend/portal_api/wsgi.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "portal-apoio-vite/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/portal_api/wsgi.py"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "portal-apoio-vite/public/static/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "portal-apoio-vite/public/images/$1"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "portal-apoio-vite/dist/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "portal-apoio-vite/dist/$1"
+    }
   ]
 } 

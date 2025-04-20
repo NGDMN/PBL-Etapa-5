@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-k&=9@lgpk7g6j^+n%2=dy!yrh+&9j!g*)bi+083)b#&(h7jmeb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app']
 
 
 # Application definition
@@ -134,7 +134,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite default port
+    "https://pbl-omega.vercel.app",  # Seu domínio no Vercel
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

@@ -14,7 +14,7 @@ const Marketplace = () => {
       name: 'Arroz',
       price: 25.90,
       stock: 50,
-      image: '/images/arroz.jpg',
+      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300',
       description: 'Arroz branco de alta qualidade'
     },
     {
@@ -22,7 +22,7 @@ const Marketplace = () => {
       name: 'Leite',
       price: 4.50,
       stock: 100,
-      image: '/images/leite.jpg',
+      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300',
       description: 'Leite integral fresco'
     },
     {
@@ -30,7 +30,7 @@ const Marketplace = () => {
       name: 'Café',
       price: 15.90,
       stock: 30,
-      image: '/images/cafe.jpg',
+      image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=300',
       description: 'Café torrado e moído'
     }
   ];
