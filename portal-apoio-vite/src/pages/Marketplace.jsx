@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 const Marketplace = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const products = [
     {
@@ -13,7 +14,7 @@ const Marketplace = () => {
       name: 'Arroz',
       price: 25.90,
       stock: 50,
-      image: 'https://via.placeholder.com/300x200?text=Arroz',
+      image: '/images/arroz.jpg',
       description: 'Arroz branco de alta qualidade'
     },
     {
@@ -21,7 +22,7 @@ const Marketplace = () => {
       name: 'Leite',
       price: 4.50,
       stock: 100,
-      image: 'https://via.placeholder.com/300x200?text=Leite',
+      image: '/images/leite.jpg',
       description: 'Leite integral fresco'
     },
     {
@@ -29,7 +30,7 @@ const Marketplace = () => {
       name: 'Café',
       price: 15.90,
       stock: 30,
-      image: 'https://via.placeholder.com/300x200?text=Café',
+      image: '/images/cafe.jpg',
       description: 'Café torrado e moído'
     }
   ];
@@ -40,6 +41,7 @@ const Marketplace = () => {
 
   useEffect(() => {
     try {
+      setLoading(true);
       // Verificar se as imagens existem
       products.forEach(product => {
         const img = new Image();
@@ -51,36 +53,53 @@ const Marketplace = () => {
     } catch (err) {
       setError('Erro ao carregar produtos');
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  if (error) {
-    return (
-      <div className="container my-5">
+  return (
+    <div className="container my-5 pt-4">
+      <h2 className="mb-4">Marketplace</h2>
+      
+      {error && (
         <div className="alert alert-danger" role="alert">
           {error}
         </div>
-      </div>
-    );
-  }
+      )}
 
-  return (
-    <div className="container my-5">
-      <h2>Marketplace</h2>
-      <input
-        type="text"
-        className="form-control mb-3"
-        placeholder="Buscar produtos..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <div className="row">
-        {filteredProducts.map(product => (
-          <div key={product.id} className="col-md-4 mb-4">
-            <ProductCard product={product} />
-          </div>
-        ))}
+      <div className="mb-4">
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Buscar produtos..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
+
+      {loading ? (
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Carregando...</span>
+          </div>
+        </div>
+      ) : (
+        <div className="row">
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map(product => (
+              <div key={product.id} className="col-md-4 mb-4">
+                <ProductCard product={product} />
+              </div>
+            ))
+          ) : (
+            <div className="col-12">
+              <p className="text-center">Nenhum produto encontrado</p>
+            </div>
+          )}
+        </div>
+      )}
+
       <CartModal />
     </div>
   );

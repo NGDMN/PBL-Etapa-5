@@ -3,6 +3,11 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 
+// URL do backend baseada no ambiente
+const API_URL = import.meta.env.PROD 
+  ? 'https://seu-backend.vercel.app/api'  // URL do backend em produção
+  : 'http://localhost:8000/api';
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/users/login/', credentials);
+      const response = await axios.post(`${API_URL}/users/login/`, credentials);
       const { user, token } = response.data;
       setUser(user);
       localStorage.setItem('token', token);
@@ -32,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:8000/api/users/register/', userData);
+      const response = await axios.post(`${API_URL}/users/register/`, userData);
       const { user, token } = response.data;
       setUser(user);
       localStorage.setItem('token', token);
@@ -40,7 +45,19 @@ export const AuthProvider = ({ children }) => {
       return true;
     } catch (err) {
       console.error('Erro no registro:', err.response?.data);
-      setError(err.response?.data?.message || 'Erro ao criar conta. Por favor, tente novamente.');
+      if (err.response?.data) {
+        // Se o erro é um objeto, converte para string
+        if (typeof err.response.data === 'object') {
+          const errorMessages = Object.entries(err.response.data)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join('\n');
+          setError(errorMessages);
+        } else {
+          setError(err.response.data);
+        }
+      } else {
+        setError('Erro ao conectar com o servidor. Por favor, tente novamente.');
+      }
       return false;
     }
   };
