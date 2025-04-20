@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import CartModal from '../components/CartModal';
 import { useCart } from '../context/CartContext';
 
 const Marketplace = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState(null);
 
   const products = [
     {
@@ -12,7 +13,7 @@ const Marketplace = () => {
       name: 'Arroz',
       price: 25.90,
       stock: 50,
-      image: '/static/images/saca_de_arroz-Foto-Arquivo-EBC.webp',
+      image: 'https://via.placeholder.com/300x200?text=Arroz',
       description: 'Arroz branco de alta qualidade'
     },
     {
@@ -20,7 +21,7 @@ const Marketplace = () => {
       name: 'Leite',
       price: 4.50,
       stock: 100,
-      image: '/static/images/Leite.jpg',
+      image: 'https://via.placeholder.com/300x200?text=Leite',
       description: 'Leite integral fresco'
     },
     {
@@ -28,7 +29,7 @@ const Marketplace = () => {
       name: 'Café',
       price: 15.90,
       stock: 30,
-      image: '/static/images/Café.jpg',
+      image: 'https://via.placeholder.com/300x200?text=Café',
       description: 'Café torrado e moído'
     }
   ];
@@ -36,6 +37,32 @@ const Marketplace = () => {
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  useEffect(() => {
+    try {
+      // Verificar se as imagens existem
+      products.forEach(product => {
+        const img = new Image();
+        img.src = product.image;
+        img.onerror = () => {
+          console.error(`Erro ao carregar imagem: ${product.image}`);
+        };
+      });
+    } catch (err) {
+      setError('Erro ao carregar produtos');
+      console.error(err);
+    }
+  }, []);
+
+  if (error) {
+    return (
+      <div className="container my-5">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container my-5">
