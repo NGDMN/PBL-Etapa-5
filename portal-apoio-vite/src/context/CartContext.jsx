@@ -1,7 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import { useAuth } from './AuthContext';
-import { cart } from '../services/api';
 
 const CartContext = createContext();
 
@@ -9,108 +7,68 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const { user } = useAuth();
 
-  // Load cart from backend
+  // Carregar carrinho do localStorage
   useEffect(() => {
-    const loadCart = async () => {
-      if (user) {
-        try {
-          const cartData = await cart.getCart();
-          setCartItems(cartData.items || []);
-        } catch (error) {
-          console.error('Erro ao carregar carrinho:', error);
-        }
-      } else {
-        setCartItems([]);
-      }
-    };
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) setCartItems(JSON.parse(savedCart));
+  }, []);
 
-    loadCart();
-  }, [user]);
+  // Salvar carrinho no localStorage
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }, [cartItems]);
 
-  const addToCart = async (product, quantity = 1) => {
-    if (!user) {
-      setIsLoginModalOpen(true);
-      return;
-    }
-
+  const addToCart = (product, quantity = 1) => {
     if (quantity <= 0) {
       toast.error('Quantidade inválida');
       return;
     }
 
-    try {
-      const cartData = await cart.getCart();
-      await cart.addItem(cartData.id, product.id, quantity);
-      
-      // Atualiza o estado local
-      setCartItems(prev => {
-        const existingItem = prev.find(item => item.product.id === product.id);
-        if (existingItem) {
-          return prev.map(item =>
-            item.product.id === product.id
-              ? { ...item, quantity: item.quantity + quantity }
-              : item
-          );
+    setCartItems(prev => {
+      const existingItem = prev.find(item => item.id === product.id);
+      if (existingItem) {
+        // Verificar estoque
+        if (existingItem.quantity + quantity > product.stock) {
+          toast.error('Quantidade excede o estoque disponível');
+          return prev;
         }
-        return [...prev, { product, quantity }];
-      });
-
+        return prev.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
       toast.success('Produto adicionado ao carrinho');
-    } catch (error) {
-      toast.error(error.response?.data?.error || 'Erro ao adicionar ao carrinho');
-    }
+      return [...prev, { ...product, quantity }];
+    });
   };
 
-  const removeFromCart = async (productId) => {
-    if (!user) return;
-
-    try {
-      const cartData = await cart.getCart();
-      await cart.removeItem(cartData.id, productId, 1);
-      
-      setCartItems(prev => prev.filter(item => item.product.id !== productId));
-      toast.success('Produto removido do carrinho');
-    } catch (error) {
-      toast.error('Erro ao remover do carrinho');
-    }
+  const removeFromCart = (productId) => {
+    setCartItems(prev => prev.filter(item => item.id !== productId));
+    toast.success('Produto removido do carrinho');
   };
 
-  const updateQuantity = async (productId, newQuantity) => {
-    if (!user) return;
-
+  const updateQuantity = (productId, newQuantity) => {
     if (newQuantity <= 0) {
       removeFromCart(productId);
       return;
     }
 
-    try {
-      const cartData = await cart.getCart();
-      const currentItem = cartItems.find(item => item.product.id === productId);
-      const quantityDiff = newQuantity - currentItem.quantity;
-
-      if (quantityDiff > 0) {
-        await cart.addItem(cartData.id, productId, quantityDiff);
-      } else {
-        await cart.removeItem(cartData.id, productId, -quantityDiff);
-      }
-
-      setCartItems(prev => prev.map(item => {
-        if (item.product.id === productId) {
-          return { ...item, quantity: newQuantity };
+    setCartItems(prev => prev.map(item => {
+      if (item.id === productId) {
+        if (newQuantity > item.stock) {
+          toast.error('Quantidade excede o estoque disponível');
+          return item;
         }
-        return item;
-      }));
-    } catch (error) {
-      toast.error('Erro ao atualizar quantidade');
-    }
+        return { ...item, quantity: newQuantity };
+      }
+      return item;
+    }));
   };
 
   const getCartTotal = () => {
-    return cartItems.reduce((total, item) => 
-      total + (item.product.price * item.quantity), 0
-    );
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   const getCartCount = () => {
@@ -123,11 +81,13 @@ export const CartProvider = ({ children }) => {
   };
 
   const checkout = () => {
-    if (!user) {
+    // Verificar se usuário está logado (simulação)
+    const isLoggedIn = false; // Substituir pela sua lógica de autenticação
+    if (!isLoggedIn) {
       setIsLoginModalOpen(true);
       return;
     }
-    // Implementar checkout
+    // Processo de checkout
     clearCart();
   };
 

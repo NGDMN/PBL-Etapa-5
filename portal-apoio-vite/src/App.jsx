@@ -7,9 +7,10 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Marketplace from './pages/Marketplace';
 import Training from './pages/Training';
+import Login from './pages/Login';
+import Register from './pages/Register';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
-import { ReviewProvider } from './context/ReviewContext';
 import './styles/styles.css';
 
 function App() {
@@ -17,21 +18,21 @@ function App() {
     <Router>
       <AuthProvider>
         <CartProvider>
-          <ReviewProvider>
-            <div className="App">
-              <Navbar />
-              <main className="container flex-grow-1">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/sobre" element={<About />} />
-                  <Route path="/contato" element={<Contact />} />
-                  <Route path="/marketplace" element={<Marketplace />} />
-                  <Route path="/treinamentos" element={<Training />} />
-                </Routes>
-              </main>
-              <Footer />
-            </div>
-          </ReviewProvider>
+          <div className="App">
+            <Navbar />
+            <main className="container flex-grow-1">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/sobre" element={<About />} />
+                <Route path="/contato" element={<Contact />} />
+                <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/treinamentos" element={<Training />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/cadastro" element={<Register />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
         </CartProvider>
       </AuthProvider>
     </Router>

@@ -1,62 +1,70 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../services/api';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          // Aqui você pode adicionar uma chamada para verificar o token
-          // e obter os dados do usuário
-          const response = await auth.getUser();
-          setUser(response.data);
-        }
-      } catch (error) {
-        console.error('Erro ao verificar autenticação:', error);
-        auth.logout();
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkAuth();
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Implement token validation with backend
+    }
+    setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (credentials) => {
     try {
-      const response = await auth.login(email, password);
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      throw error;
+      const response = await axios.post('http://localhost:8000/api/users/login/', credentials);
+      const { user, token } = response.data;
+      setUser(user);
+      localStorage.setItem('token', token);
+      setError(null);
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erro ao fazer login');
+      return false;
     }
   };
 
   const register = async (userData) => {
     try {
-      const response = await auth.register(userData);
-      return response;
-    } catch (error) {
-      throw error;
+      const response = await axios.post('http://localhost:8000/api/users/register/', userData);
+      const { user, token } = response.data;
+      setUser(user);
+      localStorage.setItem('token', token);
+      setError(null);
+      return true;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Erro ao criar conta');
+      return false;
     }
   };
 
   const logout = () => {
-    auth.logout();
     setUser(null);
+    localStorage.removeItem('token');
   };
 
-  return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = {
+    user,
+    loading,
+    error,
+    login,
+    register,
+    logout,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => useContext(AuthContext); 
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}; 
