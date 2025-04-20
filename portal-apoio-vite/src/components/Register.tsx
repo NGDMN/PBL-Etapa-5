@@ -1,23 +1,24 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 interface FormData {
   username: string;
+  email: string;
   password: string;
-  email?: string;
-  confirmPassword?: string;
+  confirmPassword: string;
 }
 
-const Login = () => {
-  const { login } = useAuth();
+const Register = () => {
+  const { register } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     username: '',
+    email: '',
     password: '',
+    confirmPassword: ''
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -32,11 +33,21 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(formData.username, formData.password);
-      toast.success('Login realizado com sucesso!');
-      navigate('/');
+      if (formData.password !== formData.confirmPassword) {
+        toast.error('As senhas não coincidem');
+        return;
+      }
+
+      await register({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      });
+      
+      toast.success('Cadastro realizado com sucesso!');
+      navigate('/login');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao realizar login');
+      toast.error(error.response?.data?.message || 'Erro ao realizar cadastro');
     } finally {
       setLoading(false);
     }
@@ -44,7 +55,7 @@ const Login = () => {
 
   return (
     <div className="auth-container">
-      <h2>Login</h2>
+      <h2>Criar Conta</h2>
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -53,6 +64,18 @@ const Login = () => {
             type="text"
             name="username"
             value={formData.username}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
             onChange={handleChange}
             required
             disabled={loading}
@@ -71,18 +94,30 @@ const Login = () => {
           />
         </div>
 
+        <div className="form-group">
+          <label>Confirmar Senha</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+        </div>
+
         <button type="submit" disabled={loading}>
-          {loading ? 'Processando...' : 'Entrar'}
+          {loading ? 'Processando...' : 'Cadastrar'}
         </button>
       </form>
 
       <div className="auth-links">
-        <Link to="/register" className="register-link">
-          Criar uma conta
+        <Link to="/login" className="login-link">
+          Já tenho uma conta
         </Link>
       </div>
     </div>
   );
 };
 
-export default Login; 
+export default Register; 
