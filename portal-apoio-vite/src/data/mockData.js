@@ -73,7 +73,7 @@ export const MOCK_PRODUCTS = [
     name: 'Ovos Caipira',
     description: 'Ovos caipiras de galinhas criadas ao ar livre, com alimentação natural.',
     price: 12.99,
-    image: 'https://images.pexels.com/photos/1556706/pexels-photo-1556706.jpeg?auto=compress&cs=tinysrgb&w=600',
+    image: 'https://img.fazendinha.me/production/produtor/697/produtos/6351/ovo-caipira-seu-ze-caixa-de-ovos-caipira-seu-ze-180-ovos-a-granel-1727883805.jpg',
     category: 'Produtos Animais',
     stock: 20,
     farmer: 'Granja Feliz',
