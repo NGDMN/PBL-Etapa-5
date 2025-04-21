@@ -85,15 +85,28 @@ WSGI_APPLICATION = 'portal_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Verifica o ambiente - se estiver no Vercel, usa SQLite em memória
+# Verifica o ambiente
 if os.environ.get('VERCEL_ENV'):
-    # Use SQLite in-memory para Vercel (readonly filesystem)
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',  # usar banco em memória no Vercel
+    # Database URL é fornecida pelo Vercel como variável de ambiente
+    DATABASE_URL = os.environ.get("DATABASE_URL")
+    if DATABASE_URL:
+        # Usar PostgreSQL no Neon
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=DATABASE_URL,
+                conn_max_age=600,
+                conn_health_checks=True,
+                ssl_require=True,
+            )
         }
-    }
+    else:
+        # Fallback para SQLite em memória se DATABASE_URL não estiver disponível
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': ':memory:',  # usar banco em memória como fallback
+            }
+        }
 else:
     # Para ambiente de desenvolvimento local
     DATABASES = {
