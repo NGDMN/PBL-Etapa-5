@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// Obtém a URL da API das variáveis de ambiente
+// URL da API baseada no ambiente
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-console.log('API URL:', API_URL); // Para debug
+console.log('API URL:', API_URL);
 
 const api = axios.create({
   baseURL: API_URL,

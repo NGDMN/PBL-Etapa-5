@@ -16,11 +16,22 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "https://pbl-omega-backend.vercel.app/api/$1"
+      "dest": "https://pbl-etapa-5.vercel.app/api/$1"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
+    }
+  ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
     }
   ]
 } 
