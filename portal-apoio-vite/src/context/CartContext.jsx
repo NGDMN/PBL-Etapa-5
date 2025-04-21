@@ -69,7 +69,7 @@ export const CartProvider = ({ children }) => {
 
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => {
-      // Garante que o preço seja um número válido
+      // Garante que o preço e quantidade sejam números válidos
       const price = Number(item.price) || 0;
       const quantity = Number(item.quantity) || 0;
       return total + (price * quantity);

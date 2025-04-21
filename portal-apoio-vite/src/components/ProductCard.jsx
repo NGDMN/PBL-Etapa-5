@@ -5,31 +5,26 @@ const ProductCard = ({ product }) => {
   const [showModal, setShowModal] = useState(false);
   const [imgError, setImgError] = useState(false);
 
+  // Garantir que temos valores seguros
+  const safeProduct = {
+    id: product?.id || 0,
+    name: product?.name || 'Produto sem nome',
+    description: product?.description || 'Sem descrição disponível',
+    price: Number(product?.price) || 0,
+    stock: Number(product?.stock) || 0,
+    image: product?.image || '/placeholder-image.jpg',
+    average_rating: Number(product?.average_rating) || 0
+  };
+
   const handleImageError = () => {
     setImgError(true);
-    console.error(`Erro ao carregar imagem para o produto: ${product?.name}`);
+    console.error(`Erro ao carregar imagem para o produto: ${safeProduct.name}`);
   };
 
-  // Se o produto não existir, não renderiza nada
-  if (!product) {
-    console.warn('Tentativa de renderizar ProductCard sem dados de produto');
-    return null;
-  }
-
+  // Formatar preço sempre retornando string com 2 casas decimais
   const formatPrice = (price) => {
-    // Converte para número e verifica se é válido
-    const numericPrice = Number(price);
-    if (!isNaN(numericPrice) && isFinite(numericPrice)) {
-      return numericPrice.toFixed(2);
-    }
-    return '0.00';
+    return (Number(price) || 0).toFixed(2);
   };
-
-  // Placeholders para valores faltantes
-  const productName = product.name || 'Produto sem nome';
-  const productImage = product.image || '/placeholder-image.jpg';
-  const productPrice = formatPrice(product.price);
-  const productStock = product.stock || 0;
 
   return (
     <>
@@ -47,23 +42,23 @@ const ProductCard = ({ product }) => {
           </div>
         ) : (
           <img
-            src={productImage}
+            src={safeProduct.image}
             className="card-img-top"
-            alt={productName}
+            alt={safeProduct.name}
             style={{ height: '200px', objectFit: 'cover' }}
             onError={handleImageError}
           />
         )}
         <div className="card-body">
-          <h5 className="card-title">{productName}</h5>
-          <p className="card-text mb-0">R$ {productPrice}</p>
-          <small className="text-muted">Estoque: {productStock} unidades</small>
+          <h5 className="card-title">{safeProduct.name}</h5>
+          <p className="card-text mb-0">R$ {formatPrice(safeProduct.price)}</p>
+          <small className="text-muted">Estoque: {safeProduct.stock} unidades</small>
         </div>
       </div>
 
       {showModal && (
         <ProductDetailModal
-          product={product}
+          product={safeProduct}
           show={showModal}
           onHide={() => setShowModal(false)}
         />

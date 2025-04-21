@@ -1,12 +1,7 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
-// Usar API_URL corretamente
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
-console.log('AuthContext API URL:', API_URL);
-
+// Contexto de autenticação simplificado sem API
 const AuthContext = createContext({});
 
 export function AuthProvider({ children }) {
@@ -15,88 +10,109 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      checkAuth();
-    } else {
-      setLoading(false);
+  // Simulação de usuários cadastrados
+  const MOCK_USERS = [
+    {
+      id: 1,
+      email: 'admin@example.com',
+      password: 'admin123',
+      username: 'admin',
+      first_name: 'Administrador',
+      last_name: 'Sistema'
     }
-  }, []);
+  ];
 
-  const checkAuth = async () => {
-    try {
-      const endpoint = `${API_URL}/api/users/me`;
-      console.log('Checking auth at:', endpoint);
-      const response = await axios.get(endpoint);
-      setUser(response.data);
-    } catch (error) {
-      console.error('Erro ao verificar autenticação:', error);
-      logout();
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    // Verificar se existe um usuário no localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-  };
+    setLoading(false);
+  }, []);
 
   const login = async (email, password) => {
     try {
-      const endpoint = `${API_URL}/api/users/login/`;
-      console.log('Logging in at:', endpoint);
-      console.log('Login data:', { email, password });
+      console.log('Tentando login com:', { email, password });
       
-      const response = await axios.post(endpoint, {
-        email,
-        password,
-      });
+      // Simulação de verificação com dados mockados
+      const foundUser = MOCK_USERS.find(u => 
+        u.email === email && u.password === password
+      );
       
-      console.log('Login response:', response.data);
-      
-      const { token, user: userData } = response.data;
-      localStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      setUser(userData);
-      setError(null);
-      navigate('/marketplace');
-      return { success: true };
+      if (foundUser) {
+        // Remover a senha do objeto do usuário por segurança
+        const { password, ...userWithoutPassword } = foundUser;
+        
+        // Salvar no estado e localStorage
+        setUser(userWithoutPassword);
+        localStorage.setItem('user', JSON.stringify(userWithoutPassword));
+        
+        setError(null);
+        navigate('/marketplace');
+        return { success: true };
+      } else {
+        setError('Email ou senha inválidos');
+        return {
+          success: false,
+          error: 'Email ou senha inválidos'
+        };
+      }
     } catch (error) {
       console.error('Erro no login:', error);
-      const errorMessage = error.response?.data?.message || error.response?.data || 'Erro ao fazer login';
-      setError(errorMessage);
+      setError('Ocorreu um erro ao tentar fazer login');
       return {
         success: false,
-        error: errorMessage
+        error: 'Ocorreu um erro ao tentar fazer login'
       };
     }
   };
 
   const register = async (userData) => {
     try {
-      const endpoint = `${API_URL}/api/users/register/`;
-      console.log('Registering at:', endpoint);
-      console.log('User data:', userData);
+      console.log('Registrando usuário:', userData);
       
-      const response = await axios.post(endpoint, userData);
+      // Verificar se o email já existe
+      if (MOCK_USERS.some(u => u.email === userData.email)) {
+        setError('Este email já está cadastrado');
+        return {
+          success: false,
+          error: 'Este email já está cadastrado'
+        };
+      }
       
-      console.log('Registration response:', response.data);
+      // Simular criação de novo usuário (apenas em memória)
+      const newUser = {
+        id: MOCK_USERS.length + 1,
+        ...userData
+      };
+      
+      // Adicionar à lista de usuários mockados (em memória)
+      MOCK_USERS.push(newUser);
+      
+      console.log('Usuário registrado com sucesso:', newUser);
       setError(null);
+      
+      // Redirecionar para login
       navigate('/login');
-      return { success: true, data: response.data };
+      
+      return { 
+        success: true, 
+        data: { message: 'Usuário registrado com sucesso' } 
+      };
     } catch (error) {
       console.error('Erro no registro:', error);
-      const errorMessage = error.response?.data?.message || error.response?.data || 'Erro ao registrar usuário';
-      setError(errorMessage);
+      setError('Ocorreu um erro ao tentar registrar o usuário');
       return {
         success: false,
-        error: errorMessage
+        error: 'Ocorreu um erro ao tentar registrar o usuário'
       };
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
+    localStorage.removeItem('user');
     navigate('/login');
   };
 

@@ -7,57 +7,54 @@ const ProductDetailModal = ({ product, show, onHide }) => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
 
-  // Garantir que temos um produto válido
-  const safeProduct = product || {};
-  
-  // Extrair e normalizar os valores
-  const productName = safeProduct.name || 'Produto sem nome';
-  const productDescription = safeProduct.description || 'Sem descrição disponível';
-  const productImage = safeProduct.image || '/placeholder-image.jpg';
-  const productStock = Number(safeProduct.stock) || 0;
-  const productRating = Number(safeProduct.average_rating) || 0;
+  // Garantir valores seguros
+  const safeProduct = {
+    id: product?.id || 0,
+    name: product?.name || 'Produto sem nome',
+    description: product?.description || 'Sem descrição disponível',
+    price: Number(product?.price) || 0,
+    stock: Number(product?.stock) || 0,
+    image: product?.image || '/placeholder-image.jpg',
+    average_rating: Number(product?.average_rating) || 0
+  };
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    addToCart(safeProduct, quantity);
     onHide();
   };
 
+  // Formatar preço sempre retornando string com 2 casas decimais
   const formatPrice = (price) => {
-    // Converte para número e verifica se é válido
-    const numericPrice = Number(price);
-    if (!isNaN(numericPrice) && isFinite(numericPrice)) {
-      return numericPrice.toFixed(2);
-    }
-    return '0.00';
+    return (Number(price) || 0).toFixed(2);
   };
 
+  // Formatar avaliação sempre retornando string com 1 casa decimal
   const formatRating = (rating) => {
-    // Converte para número e verifica se é válido
-    const numericRating = Number(rating);
-    if (!isNaN(numericRating) && isFinite(numericRating)) {
-      return numericRating.toFixed(1);
-    }
-    return '0.0';
+    return (Number(rating) || 0).toFixed(1);
   };
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>{productName}</Modal.Title>
+        <Modal.Title>{safeProduct.name}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="row">
           <div className="col-md-6">
             <img
-              src={productImage}
-              alt={productName}
+              src={safeProduct.image}
+              alt={safeProduct.name}
               className="img-fluid rounded"
               style={{ maxHeight: '400px', width: '100%', objectFit: 'cover' }}
+              onError={(e) => {
+                e.target.src = '/placeholder-image.jpg';
+                e.target.onerror = null;
+              }}
             />
           </div>
           <div className="col-md-6">
             <h4>Descrição</h4>
-            <p>{productDescription}</p>
+            <p>{safeProduct.description}</p>
             <h4>Preço</h4>
             <p className="h5">R$ {formatPrice(safeProduct.price)}</p>
             <h4>Avaliação</h4>
@@ -65,14 +62,14 @@ const ProductDetailModal = ({ product, show, onHide }) => {
               {[1, 2, 3, 4, 5].map((star) => (
                 <FaStar
                   key={star}
-                  color={star <= productRating ? "#ffc107" : "#e4e5e9"}
+                  color={star <= safeProduct.average_rating ? "#ffc107" : "#e4e5e9"}
                   size={20}
                 />
               ))}
-              <span className="ms-2">({formatRating(productRating)})</span>
+              <span className="ms-2">({formatRating(safeProduct.average_rating)})</span>
             </div>
             <h4>Estoque</h4>
-            <p>{productStock} unidades</p>
+            <p>{safeProduct.stock} unidades</p>
             <Form.Group className="mb-3">
               <Form.Label>Quantidade</Form.Label>
               <Form.Control
@@ -80,13 +77,13 @@ const ProductDetailModal = ({ product, show, onHide }) => {
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 min="1"
-                max={productStock || 1}
+                max={safeProduct.stock || 1}
               />
             </Form.Group>
             <Button
               variant="primary"
               onClick={handleAddToCart}
-              disabled={quantity > productStock}
+              disabled={quantity > safeProduct.stock}
             >
               Adicionar ao Carrinho
             </Button>
