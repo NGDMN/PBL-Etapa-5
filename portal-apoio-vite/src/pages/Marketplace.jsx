@@ -10,19 +10,43 @@ const Marketplace = () => {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtra apenas produtos com dados válidos e cujo nome inclui o termo de busca
+  const filteredProducts = products
+    .filter(product => 
+      product && 
+      product.name && 
+      typeof product.name === 'string' && 
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         const data = await getProducts();
-        setProducts(data);
+        
+        // Verifica se data é um array antes de definir os produtos
+        if (Array.isArray(data)) {
+          // Garante que todos os produtos tenham os campos necessários
+          const validProducts = data.map(product => ({
+            id: product.id || Math.random().toString(36).substr(2, 9),
+            name: product.name || 'Produto sem nome',
+            description: product.description || 'Sem descrição',
+            price: Number(product.price) || 0,
+            stock: Number(product.stock) || 0,
+            image: product.image || null,
+            average_rating: Number(product.average_rating) || 0
+          }));
+          
+          setProducts(validProducts);
+          console.log('Produtos processados:', validProducts);
+        } else {
+          console.error('Dados de produtos inválidos:', data);
+          setError('Formato de dados inválido');
+        }
       } catch (err) {
         setError('Erro ao carregar produtos');
-        console.error(err);
+        console.error('Erro no marketplace:', err);
       } finally {
         setLoading(false);
       }

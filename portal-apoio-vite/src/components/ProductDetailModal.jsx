@@ -7,6 +7,16 @@ const ProductDetailModal = ({ product, show, onHide }) => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
 
+  // Garantir que temos um produto válido
+  const safeProduct = product || {};
+  
+  // Extrair e normalizar os valores
+  const productName = safeProduct.name || 'Produto sem nome';
+  const productDescription = safeProduct.description || 'Sem descrição disponível';
+  const productImage = safeProduct.image || '/placeholder-image.jpg';
+  const productStock = Number(safeProduct.stock) || 0;
+  const productRating = Number(safeProduct.average_rating) || 0;
+
   const handleAddToCart = () => {
     addToCart(product, quantity);
     onHide();
@@ -33,36 +43,36 @@ const ProductDetailModal = ({ product, show, onHide }) => {
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>{product?.name || 'Produto sem nome'}</Modal.Title>
+        <Modal.Title>{productName}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className="row">
           <div className="col-md-6">
             <img
-              src={product?.image || '/placeholder-image.jpg'}
-              alt={product?.name || 'Produto'}
+              src={productImage}
+              alt={productName}
               className="img-fluid rounded"
               style={{ maxHeight: '400px', width: '100%', objectFit: 'cover' }}
             />
           </div>
           <div className="col-md-6">
             <h4>Descrição</h4>
-            <p>{product?.description || 'Sem descrição disponível'}</p>
+            <p>{productDescription}</p>
             <h4>Preço</h4>
-            <p className="h5">R$ {formatPrice(product?.price)}</p>
+            <p className="h5">R$ {formatPrice(safeProduct.price)}</p>
             <h4>Avaliação</h4>
             <div className="mb-3">
               {[1, 2, 3, 4, 5].map((star) => (
                 <FaStar
                   key={star}
-                  color={star <= (product?.average_rating || 0) ? "#ffc107" : "#e4e5e9"}
+                  color={star <= productRating ? "#ffc107" : "#e4e5e9"}
                   size={20}
                 />
               ))}
-              <span className="ms-2">({formatRating(product?.average_rating)})</span>
+              <span className="ms-2">({formatRating(productRating)})</span>
             </div>
             <h4>Estoque</h4>
-            <p>{product?.stock || 0} unidades</p>
+            <p>{productStock} unidades</p>
             <Form.Group className="mb-3">
               <Form.Label>Quantidade</Form.Label>
               <Form.Control
@@ -70,13 +80,13 @@ const ProductDetailModal = ({ product, show, onHide }) => {
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 min="1"
-                max={product?.stock || 1}
+                max={productStock || 1}
               />
             </Form.Group>
             <Button
               variant="primary"
               onClick={handleAddToCart}
-              disabled={quantity > (product?.stock || 0)}
+              disabled={quantity > productStock}
             >
               Adicionar ao Carrinho
             </Button>

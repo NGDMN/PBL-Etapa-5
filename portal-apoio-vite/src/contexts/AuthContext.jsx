@@ -2,6 +2,7 @@ import { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+// Usar API_URL corretamente
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 console.log('AuthContext API URL:', API_URL);
@@ -26,8 +27,9 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      console.log('Checking auth at:', `${API_URL}/api/users/me`);
-      const response = await axios.get(`${API_URL}/api/users/me`);
+      const endpoint = `${API_URL}/api/users/me`;
+      console.log('Checking auth at:', endpoint);
+      const response = await axios.get(endpoint);
       setUser(response.data);
     } catch (error) {
       console.error('Erro ao verificar autenticação:', error);
@@ -39,11 +41,16 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      console.log('Logging in at:', `${API_URL}/api/auth/login`);
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
+      const endpoint = `${API_URL}/api/users/login/`;
+      console.log('Logging in at:', endpoint);
+      console.log('Login data:', { email, password });
+      
+      const response = await axios.post(endpoint, {
         email,
         password,
       });
+      
+      console.log('Login response:', response.data);
       
       const { token, user: userData } = response.data;
       localStorage.setItem('token', token);
@@ -54,28 +61,34 @@ export function AuthProvider({ children }) {
       return { success: true };
     } catch (error) {
       console.error('Erro no login:', error);
-      setError(error.response?.data?.message || 'Erro ao fazer login');
+      const errorMessage = error.response?.data?.message || error.response?.data || 'Erro ao fazer login';
+      setError(errorMessage);
       return {
         success: false,
-        error: error.response?.data?.message || 'Erro ao fazer login'
+        error: errorMessage
       };
     }
   };
 
   const register = async (userData) => {
     try {
-      console.log('Registering at:', `${API_URL}/api/users/register/`);
+      const endpoint = `${API_URL}/api/users/register/`;
+      console.log('Registering at:', endpoint);
       console.log('User data:', userData);
-      const response = await axios.post(`${API_URL}/api/users/register/`, userData);
+      
+      const response = await axios.post(endpoint, userData);
+      
       console.log('Registration response:', response.data);
       setError(null);
+      navigate('/login');
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Erro no registro:', error);
-      setError(error.response?.data || 'Erro ao registrar usuário');
+      const errorMessage = error.response?.data?.message || error.response?.data || 'Erro ao registrar usuário';
+      setError(errorMessage);
       return {
         success: false,
-        error: error.response?.data || 'Erro ao registrar usuário'
+        error: errorMessage
       };
     }
   };

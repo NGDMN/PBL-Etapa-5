@@ -10,7 +10,9 @@ const ProductCard = ({ product }) => {
     console.error(`Erro ao carregar imagem para o produto: ${product?.name}`);
   };
 
+  // Se o produto não existir, não renderiza nada
   if (!product) {
+    console.warn('Tentativa de renderizar ProductCard sem dados de produto');
     return null;
   }
 
@@ -22,6 +24,12 @@ const ProductCard = ({ product }) => {
     }
     return '0.00';
   };
+
+  // Placeholders para valores faltantes
+  const productName = product.name || 'Produto sem nome';
+  const productImage = product.image || '/placeholder-image.jpg';
+  const productPrice = formatPrice(product.price);
+  const productStock = product.stock || 0;
 
   return (
     <>
@@ -39,17 +47,17 @@ const ProductCard = ({ product }) => {
           </div>
         ) : (
           <img
-            src={product.image || '/placeholder-image.jpg'}
+            src={productImage}
             className="card-img-top"
-            alt={product.name || 'Produto'}
+            alt={productName}
             style={{ height: '200px', objectFit: 'cover' }}
             onError={handleImageError}
           />
         )}
         <div className="card-body">
-          <h5 className="card-title">{product.name || 'Produto sem nome'}</h5>
-          <p className="card-text mb-0">R$ {formatPrice(product.price)}</p>
-          <small className="text-muted">Estoque: {product.stock || 0} unidades</small>
+          <h5 className="card-title">{productName}</h5>
+          <p className="card-text mb-0">R$ {productPrice}</p>
+          <small className="text-muted">Estoque: {productStock} unidades</small>
         </div>
       </div>
 
