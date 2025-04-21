@@ -90,8 +90,27 @@ DATABASES = {
         default='postgres://portal_user:sPass!Word1@localhost:5432/portal_agricultura',
         conn_max_age=600,
         conn_health_checks=True,
+        ssl_require=True,
     )
 }
+
+# Adicione isto para log de SQL em produção para ajudar a diagnosticar problemas
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+            },
+        },
+    }
 
 
 # Password validation
