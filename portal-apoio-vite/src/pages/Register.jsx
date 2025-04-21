@@ -5,13 +5,22 @@ import RegisterForm from '../components/RegisterForm';
 import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
-  const { register, error } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleRegister = async (userData) => {
-    const success = await register(userData);
-    if (success) {
-      navigate('/marketplace');
+    try {
+      const result = await register(userData);
+      if (result.success) {
+        navigate('/marketplace');
+      }
+      return result;
+    } catch (error) {
+      console.error('Erro no registro:', error);
+      return {
+        success: false,
+        error: error.response?.data || 'Erro ao registrar usuário'
+      };
     }
   };
 
@@ -22,7 +31,7 @@ const Register = () => {
           <Card>
             <Card.Header as="h4" className="text-center">Cadastro</Card.Header>
             <Card.Body>
-              <RegisterForm onSubmit={handleRegister} error={error} />
+              <RegisterForm onSubmit={handleRegister} />
               <div className="mt-3 text-center">
                 <p>
                   Já tem uma conta?{' '}

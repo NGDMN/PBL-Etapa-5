@@ -5,14 +5,13 @@ const RegisterForm = ({ onSubmit, error }) => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    confirmEmail: '',
     password: '',
     confirmPassword: '',
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
   });
 
-  const [errors, setErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,45 +19,91 @@ const RegisterForm = ({ onSubmit, error }) => {
       ...prev,
       [name]: value
     }));
+    // Limpa o erro do campo quando o usuário começa a digitar
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: null
+      }));
+    }
   };
 
   const validateForm = () => {
-    const newErrors = {};
-
-    if (formData.email !== formData.confirmEmail) {
-      newErrors.email = 'Os e-mails não correspondem';
+    const errors = {};
+    
+    if (!formData.username.trim()) {
+      errors.username = 'Nome de usuário é obrigatório';
     }
-
+    
+    if (!formData.email.trim()) {
+      errors.email = 'Email é obrigatório';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Email inválido';
+    }
+    
+    if (!formData.password) {
+      errors.password = 'Senha é obrigatória';
+    } else if (formData.password.length < 8) {
+      errors.password = 'A senha deve ter pelo menos 8 caracteres';
+    }
+    
     if (formData.password !== formData.confirmPassword) {
-      newErrors.password = 'As senhas não correspondem';
+      errors.confirmPassword = 'As senhas não coincidem';
+    }
+    
+    if (!formData.first_name.trim()) {
+      errors.first_name = 'Nome é obrigatório';
+    }
+    
+    if (!formData.last_name.trim()) {
+      errors.last_name = 'Sobrenome é obrigatório';
     }
 
-    if (formData.password.length < 8) {
-      newErrors.password = 'A senha deve ter pelo menos 8 caracteres';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      onSubmit({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        password2: formData.confirmPassword,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-      });
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      const { confirmPassword, ...userData } = formData;
+      const result = await onSubmit(userData);
+      
+      if (!result.success) {
+        if (result.error) {
+          // Se o erro for um objeto, converte para string
+          const errorMessage = typeof result.error === 'object' 
+            ? Object.entries(result.error).map(([key, value]) => `${key}: ${value}`).join('\n')
+            : result.error;
+          
+          setValidationErrors(prev => ({
+            ...prev,
+            form: errorMessage
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Erro no registro:', err);
+      setValidationErrors(prev => ({
+        ...prev,
+        form: 'Ocorreu um erro ao tentar registrar. Por favor, tente novamente.'
+      }));
     }
   };
 
   return (
     <Form onSubmit={handleSubmit}>
-      {error && <Alert variant="danger">{error}</Alert>}
-
+      {validationErrors.form && (
+        <Alert variant="danger">
+          {validationErrors.form}
+        </Alert>
+      )}
+      
       <Form.Group className="mb-3">
         <Form.Label>Nome de Usuário</Form.Label>
         <Form.Control
@@ -66,53 +111,53 @@ const RegisterForm = ({ onSubmit, error }) => {
           name="username"
           value={formData.username}
           onChange={handleChange}
-          required
+          isInvalid={!!validationErrors.username}
         />
+        <Form.Control.Feedback type="invalid">
+          {validationErrors.username}
+        </Form.Control.Feedback>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Email</Form.Label>
+        <Form.Control
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          isInvalid={!!validationErrors.email}
+        />
+        <Form.Control.Feedback type="invalid">
+          {validationErrors.email}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>Nome</Form.Label>
         <Form.Control
           type="text"
-          name="firstName"
-          value={formData.firstName}
+          name="first_name"
+          value={formData.first_name}
           onChange={handleChange}
-          required
+          isInvalid={!!validationErrors.first_name}
         />
+        <Form.Control.Feedback type="invalid">
+          {validationErrors.first_name}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-3">
         <Form.Label>Sobrenome</Form.Label>
         <Form.Control
           type="text"
-          name="lastName"
-          value={formData.lastName}
+          name="last_name"
+          value={formData.last_name}
           onChange={handleChange}
-          required
+          isInvalid={!!validationErrors.last_name}
         />
-      </Form.Group>
-
-      <Form.Group className="mb-3">
-        <Form.Label>E-mail</Form.Label>
-        <Form.Control
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-      </Form.Group>
-
-      <Form.Group className="mb-3">
-        <Form.Label>Confirmar E-mail</Form.Label>
-        <Form.Control
-          type="email"
-          name="confirmEmail"
-          value={formData.confirmEmail}
-          onChange={handleChange}
-          required
-        />
-        {errors.email && <Form.Text className="text-danger">{errors.email}</Form.Text>}
+        <Form.Control.Feedback type="invalid">
+          {validationErrors.last_name}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-3">
@@ -122,8 +167,11 @@ const RegisterForm = ({ onSubmit, error }) => {
           name="password"
           value={formData.password}
           onChange={handleChange}
-          required
+          isInvalid={!!validationErrors.password}
         />
+        <Form.Control.Feedback type="invalid">
+          {validationErrors.password}
+        </Form.Control.Feedback>
       </Form.Group>
 
       <Form.Group className="mb-3">
@@ -133,12 +181,14 @@ const RegisterForm = ({ onSubmit, error }) => {
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
-          required
+          isInvalid={!!validationErrors.confirmPassword}
         />
-        {errors.password && <Form.Text className="text-danger">{errors.password}</Form.Text>}
+        <Form.Control.Feedback type="invalid">
+          {validationErrors.confirmPassword}
+        </Form.Control.Feedback>
       </Form.Group>
 
-      <Button variant="primary" type="submit">
+      <Button variant="primary" type="submit" className="w-100">
         Cadastrar
       </Button>
     </Form>
