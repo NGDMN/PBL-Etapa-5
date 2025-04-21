@@ -1,14 +1,22 @@
 import React from 'react';
 import { FaShoppingCart } from 'react-icons/fa';
 import { useCart } from '../context/CartContext';
+import { useLocation } from 'react-router-dom';
 
 const CartIcon = () => {
   const { getCartCount, setIsCartOpen } = useCart();
+  const location = useLocation();
+  
+  const openCart = () => {
+    // Abrir o carrinho em qualquer página
+    setIsCartOpen(true);
+  };
 
   return (
     <div 
       className="cart-icon position-relative d-inline-block cursor-pointer"
-      onClick={() => setIsCartOpen(true)}
+      onClick={openCart}
+      style={{ cursor: 'pointer' }}
     >
       <FaShoppingCart size={24} color="white" />
       {getCartCount() > 0 && (

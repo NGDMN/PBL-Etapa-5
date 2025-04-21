@@ -9,6 +9,7 @@ import Marketplace from './pages/Marketplace';
 import Training from './pages/Training';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import CartModal from './components/CartModal';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 import './styles/styles.css';
@@ -32,6 +33,7 @@ function App() {
               </Routes>
             </main>
             <Footer />
+            <CartModal />
           </div>
         </CartProvider>
       </AuthProvider>

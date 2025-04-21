@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import ProductCard from '../components/ProductCard';
-import CartModal from '../components/CartModal';
 import { useCart } from '../context/CartContext';
 
 // Dados estáticos para o marketplace
@@ -11,7 +10,7 @@ const MOCK_PRODUCTS = [
     description: 'Tomates frescos, cultivados sem agrotóxicos.',
     price: 8.99,
     stock: 15,
-    image: 'https://images.unsplash.com/photo-1546750670-43e5e33386db?w=500',
+    image: 'https://images.pexels.com/photos/96616/pexels-photo-96616.jpeg?auto=compress&cs=tinysrgb&w=600',
     average_rating: 4.5
   },
   {
@@ -20,7 +19,7 @@ const MOCK_PRODUCTS = [
     description: 'Alface crespa fresca, colhida no dia.',
     price: 3.5,
     stock: 20,
-    image: 'https://images.unsplash.com/photo-1556801712-76c8eb07bbc9?w=500',
+    image: 'https://images.pexels.com/photos/1199562/pexels-photo-1199562.jpeg?auto=compress&cs=tinysrgb&w=600',
     average_rating: 4.0
   },
   {
@@ -29,7 +28,7 @@ const MOCK_PRODUCTS = [
     description: 'Cenouras frescas cultivadas em solo orgânico.',
     price: 4.75,
     stock: 30,
-    image: 'https://images.unsplash.com/photo-1590868309235-ea34bed7bd7f?w=500',
+    image: 'https://images.pexels.com/photos/143133/pexels-photo-143133.jpeg?auto=compress&cs=tinysrgb&w=600',
     average_rating: 4.2
   },
   {
@@ -38,7 +37,7 @@ const MOCK_PRODUCTS = [
     description: 'Batata doce fresca, ideal para dietas saudáveis.',
     price: 5.25,
     stock: 25,
-    image: 'https://images.unsplash.com/photo-1596097634673-97375104538a?w=500',
+    image: 'https://images.pexels.com/photos/5586715/pexels-photo-5586715.jpeg?auto=compress&cs=tinysrgb&w=600',
     average_rating: 3.9
   },
   {
@@ -47,7 +46,7 @@ const MOCK_PRODUCTS = [
     description: 'Banana prata madura, vendida em dúzias.',
     price: 6.99,
     stock: 40,
-    image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=500',
+    image: 'https://images.pexels.com/photos/1093038/pexels-photo-1093038.jpeg?auto=compress&cs=tinysrgb&w=600',
     average_rating: 4.7
   },
   {
@@ -56,7 +55,7 @@ const MOCK_PRODUCTS = [
     description: 'Mel puro de abelhas, produzido por pequenos apicultores.',
     price: 25.0,
     stock: 10,
-    image: 'https://images.unsplash.com/photo-1582637142339-72ac8fdb5dc3?w=500',
+    image: 'https://images.pexels.com/photos/2213590/pexels-photo-2213590.jpeg?auto=compress&cs=tinysrgb&w=600',
     average_rating: 4.9
   }
 ];
@@ -98,8 +97,6 @@ const Marketplace = () => {
           </div>
         )}
       </div>
-
-      <CartModal />
     </div>
   );
 };

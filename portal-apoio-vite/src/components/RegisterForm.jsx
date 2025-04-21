@@ -137,6 +137,7 @@ const RegisterForm = ({ onSubmit }) => {
           value={formData.username}
           onChange={handleChange}
           isInvalid={!!validationErrors.username}
+          autoComplete="username"
         />
         <Form.Control.Feedback type="invalid">
           {validationErrors.username}
@@ -151,6 +152,7 @@ const RegisterForm = ({ onSubmit }) => {
           value={formData.email}
           onChange={handleChange}
           isInvalid={!!validationErrors.email}
+          autoComplete="email"
         />
         <Form.Control.Feedback type="invalid">
           {validationErrors.email}
@@ -165,6 +167,7 @@ const RegisterForm = ({ onSubmit }) => {
           value={formData.first_name}
           onChange={handleChange}
           isInvalid={!!validationErrors.first_name}
+          autoComplete="given-name"
         />
         <Form.Control.Feedback type="invalid">
           {validationErrors.first_name}
@@ -179,6 +182,7 @@ const RegisterForm = ({ onSubmit }) => {
           value={formData.last_name}
           onChange={handleChange}
           isInvalid={!!validationErrors.last_name}
+          autoComplete="family-name"
         />
         <Form.Control.Feedback type="invalid">
           {validationErrors.last_name}
@@ -193,7 +197,7 @@ const RegisterForm = ({ onSubmit }) => {
           value={formData.password}
           onChange={handleChange}
           isInvalid={!!validationErrors.password}
-          autocomplete="new-password"
+          autoComplete="new-password"
         />
         <Form.Control.Feedback type="invalid">
           {validationErrors.password}
@@ -208,7 +212,7 @@ const RegisterForm = ({ onSubmit }) => {
           value={formData.confirmPassword}
           onChange={handleChange}
           isInvalid={!!validationErrors.confirmPassword}
-          autocomplete="new-password"
+          autoComplete="new-password"
         />
         <Form.Control.Feedback type="invalid">
           {validationErrors.confirmPassword}

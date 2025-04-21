@@ -1,9 +1,16 @@
 import axios from 'axios';
+import { MOCK_PRODUCTS } from '../data/mockData';
+
+// Verificar se devemos usar dados mockados
+const USE_MOCK_DATA = import.meta.env.USE_MOCK_DATA === 'true';
 
 // URL da API baseada no ambiente
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-console.log('API URL:', API_URL);
+console.log('API Service: ', { 
+  useMockData: USE_MOCK_DATA,
+  apiUrl: API_URL
+});
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -36,6 +43,11 @@ api.interceptors.response.use(
 
 export const submitForm = async (formData) => {
   try {
+    if (USE_MOCK_DATA) {
+      console.log('Mock: submitForm', formData);
+      return { message: 'Formulário enviado com sucesso' };
+    }
+    
     const response = await api.post('/contact/submit/', formData);
     return response.data;
   } catch (error) {
@@ -46,6 +58,11 @@ export const submitForm = async (formData) => {
 
 export const register = async (userData) => {
   try {
+    if (USE_MOCK_DATA) {
+      console.log('Mock: register', userData);
+      return { success: true, message: 'Usuário registrado com sucesso' };
+    }
+    
     console.log('Registering user with data:', userData);
     const response = await api.post('/users/register/', userData);
     return response.data;
@@ -57,6 +74,11 @@ export const register = async (userData) => {
 
 export const login = async (credentials) => {
   try {
+    if (USE_MOCK_DATA) {
+      console.log('Mock: login', credentials);
+      return { token: 'mock-token', user: { id: 1, username: 'mock_user' } };
+    }
+    
     const response = await api.post('/users/login/', credentials);
     return response.data;
   } catch (error) {
@@ -67,6 +89,11 @@ export const login = async (credentials) => {
 
 export const getProducts = async () => {
   try {
+    if (USE_MOCK_DATA) {
+      console.log('Mock: Returning mock products');
+      return MOCK_PRODUCTS;
+    }
+    
     console.log('Fetching products from:', `${API_URL}/api/products/`);
     const response = await api.get('/products/');
     console.log('Products response:', response.data);
@@ -82,12 +109,21 @@ export const getProducts = async () => {
     return normalizedProducts;
   } catch (error) {
     console.error('Error in getProducts:', error.response?.data || error);
-    throw error;
+    
+    // Em caso de erro, retornar produtos mockados como fallback
+    console.log('Fallback: Returning mock products');
+    return MOCK_PRODUCTS;
   }
 };
 
 export const getProductDetails = async (id) => {
   try {
+    if (USE_MOCK_DATA) {
+      console.log('Mock: Returning mock product details for ID:', id);
+      const product = MOCK_PRODUCTS.find(p => p.id === Number(id));
+      return product || MOCK_PRODUCTS[0];
+    }
+    
     console.log('Fetching product details for ID:', id);
     const response = await api.get(`/products/${id}/`);
     console.log('Product details response:', response.data);
@@ -103,7 +139,10 @@ export const getProductDetails = async (id) => {
     return normalizedProduct;
   } catch (error) {
     console.error('Error in getProductDetails:', error.response?.data || error);
-    throw error;
+    
+    // Em caso de erro, retornar um produto mockado como fallback
+    console.log('Fallback: Returning mock product details');
+    return MOCK_PRODUCTS.find(p => p.id === Number(id)) || MOCK_PRODUCTS[0];
   }
 };
 
