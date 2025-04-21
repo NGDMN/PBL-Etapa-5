@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get(`${API_URL}/users/me`);
+      const response = await axios.get(`${API_URL}/api/users/me`);
       setUser(response.data);
     } catch (error) {
       console.error('Erro ao verificar autenticação:', error);
@@ -35,7 +35,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
+      const response = await axios.post(`${API_URL}/api/auth/login`, {
         email,
         password,
       });
@@ -57,7 +57,7 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, userData);
+      const response = await axios.post(`${API_URL}/api/auth/register`, userData);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Erro no registro:', error);

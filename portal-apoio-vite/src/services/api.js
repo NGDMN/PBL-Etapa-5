@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 console.log('API URL:', API_URL);
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   }
@@ -32,7 +32,7 @@ api.interceptors.response.use(
 
 export const submitForm = async (formData) => {
   try {
-    const response = await api.post('/api/submit_form', formData);
+    const response = await api.post('/submit_form', formData);
     return response.data;
   } catch (error) {
     console.error('Error in submitForm:', error);
@@ -43,7 +43,7 @@ export const submitForm = async (formData) => {
 export const register = async (userData) => {
   try {
     console.log('Registering user with data:', userData);
-    const response = await api.post('/api/users/register/', userData);
+    const response = await api.post('/auth/register', userData);
     return response.data;
   } catch (error) {
     console.error('Error in register:', error.response?.data || error);
@@ -53,7 +53,7 @@ export const register = async (userData) => {
 
 export const login = async (credentials) => {
   try {
-    const response = await api.post('/api/users/login/', credentials);
+    const response = await api.post('/auth/login', credentials);
     return response.data;
   } catch (error) {
     console.error('Error in login:', error.response?.data || error);
@@ -63,7 +63,7 @@ export const login = async (credentials) => {
 
 export const getProducts = async () => {
   try {
-    const response = await api.get('/api/products/');
+    const response = await api.get('/products');
     return response.data;
   } catch (error) {
     console.error('Error in getProducts:', error.response?.data || error);
@@ -73,7 +73,7 @@ export const getProducts = async () => {
 
 export const getProductDetails = async (id) => {
   try {
-    const response = await api.get(`/api/products/${id}/`);
+    const response = await api.get(`/products/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error in getProductDetails:', error.response?.data || error);
