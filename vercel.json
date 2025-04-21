@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/wsgi.py",
+      "src": "backend/portal_api/wsgi.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
@@ -13,7 +13,8 @@
       "src": "portal-apoio-vite/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "dist",
+        "buildCommand": "cd portal-apoio-vite && npm install && npm run build"
       }
     }
   ],
@@ -24,11 +25,15 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "/backend/wsgi.py"
+      "dest": "/backend/portal_api/wsgi.py"
+    },
+    {
+      "src": "/(.*\\.[^/]*)",
+      "dest": "/portal-apoio-vite/dist/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/portal-apoio-vite/dist/$1"
+      "dest": "/portal-apoio-vite/dist/index.html"
     }
   ],
   "env": {
