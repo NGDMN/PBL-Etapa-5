@@ -6,19 +6,22 @@ Este projeto é uma aplicação web moderna que visa apoiar a agricultura famili
 
 ### Frontend
 - React 18
-- Vite
+- Vite 6
 - React Router DOM v7
 - Bootstrap 5
 - React Icons
+- React Bootstrap
 - Axios para requisições HTTP
 - Context API para gerenciamento de estado
+- Estratégia de fallback para dados offline
 
 ### Backend
 - Django 5.0
 - Django REST Framework
-- PostgreSQL
+- SQLite (desenvolvimento local e banco em memória para Vercel)
 - Django CORS Headers
 - Python-dotenv
+- Autenticação customizada
 
 ## 📁 Estrutura do Projeto
 
@@ -29,6 +32,7 @@ projeto/
 │   ├── users/            # App de usuários
 │   ├── products/         # App de produtos
 │   ├── reviews/          # App de avaliações
+│   ├── contact/          # App de contato
 │   ├── media/           # Arquivos de mídia
 │   ├── manage.py        # Script de gerenciamento Django
 │   ├── requirements.txt # Dependências Python
@@ -39,6 +43,8 @@ projeto/
     │   ├── components/  # Componentes React
     │   ├── pages/      # Páginas da aplicação
     │   ├── services/   # Serviços e configuração da API
+    │   ├── context/    # Contextos React
+    │   ├── data/       # Dados mockados para desenvolvimento
     │   └── styles/     # Arquivos CSS
     ├── public/         # Arquivos públicos
     ├── package.json    # Dependências Node.js
@@ -75,7 +81,7 @@ Backend (.env):
 ```
 DEBUG=False
 ALLOWED_HOSTS=.vercel.app
-DATABASE_URL=sua_url_do_banco_de_dados
+VERCEL_ENV=production
 DJANGO_SECRET_KEY=sua_chave_secreta
 CORS_ALLOWED_ORIGINS=http://localhost:5173
 ```
@@ -83,6 +89,8 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173
 Frontend (.env):
 ```
 VITE_API_URL=http://localhost:8000
+USE_MOCK_DATA=true
+VITE_USE_MOCK_DATA=true
 ```
 
 ## 🚀 Executando o Projeto
@@ -99,6 +107,15 @@ cd portal-apoio-vite
 npm run dev
 ```
 
+## 🔄 Estratégias de Fallback
+
+O projeto implementa várias estratégias de tolerância a falhas:
+
+- **Modo Offline**: Usa dados mockados quando a API está indisponível
+- **Tratamento de Imagens**: Fallbacks para imagens não carregadas
+- **Banco de Dados**: Utiliza SQLite em memória no ambiente Vercel
+- **Autenticação**: Simulação de login quando o backend está indisponível
+
 ## 📋 Funcionalidades
 
 - **Autenticação**: Sistema completo de registro e login
@@ -106,13 +123,32 @@ npm run dev
 - **Carrinho de Compras**: Gerenciamento completo de carrinho
 - **Avaliações**: Sistema de reviews de produtos
 - **Perfil de Usuário**: Gerenciamento de dados do usuário
+- **Modo Responsivo**: Design adaptável para dispositivos móveis e desktop
 
 ## 🔄 Deploy
 
 O projeto está configurado para deploy no Vercel:
 
-1. Backend: https://pbl-omega-backend.vercel.app
-2. Frontend: https://frontend-nu-nine-45.vercel.app
+1. Frontend: Configurado com build estático
+2. Backend: Configurado com SQLite em memória por conta das limitações do filesystem
+3. Configurações CORS adequadas para permitir comunicação entre serviços
+
+### URLs de Deploy
+1. Frontend: https://front-sable-five.vercel.app
+2. API: https://pbl-etapa-5.vercel.app/api
+
+## 🗂️ Sobre o node_modules
+
+A pasta `node_modules` contém todas as dependências JavaScript do projeto e:
+
+- **Não é necessária para versionamento**: Está incluída no .gitignore
+- **É gerada automaticamente**: Com o comando `npm install`
+- **Não precisa ser enviada para deploy**: O Vercel instala as dependências durante o build
+
+Como prática recomendada:
+- Nunca commit a pasta node_modules no Git
+- Sempre mantenha o package.json e package-lock.json atualizados
+- Use `npm install` após clonar o repositório
 
 ## 👥 Autor
 

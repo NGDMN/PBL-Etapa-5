@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import ProductDetailModal from './ProductDetailModal';
+import { FaBox } from 'react-icons/fa';
+
+const DEFAULT_IMAGE = 'https://placehold.co/600x400?text=Imagem+não+disponível';
 
 const ProductCard = ({ product }) => {
   const [showModal, setShowModal] = useState(false);
@@ -12,7 +15,7 @@ const ProductCard = ({ product }) => {
     description: product?.description || 'Sem descrição disponível',
     price: Number(product?.price) || 0,
     stock: Number(product?.stock) || 0,
-    image: product?.image || '/placeholder-image.jpg',
+    image: product?.image || DEFAULT_IMAGE,
     average_rating: Number(product?.average_rating) || 0
   };
 
@@ -38,7 +41,10 @@ const ProductCard = ({ product }) => {
             className="card-img-top d-flex align-items-center justify-content-center bg-light" 
             style={{ height: '200px' }}
           >
-            <span className="text-muted">Imagem não disponível</span>
+            <div className="text-center">
+              <FaBox size={48} className="text-secondary mb-2" />
+              <p className="text-muted mb-0">Imagem não disponível</p>
+            </div>
           </div>
         ) : (
           <img
@@ -47,6 +53,7 @@ const ProductCard = ({ product }) => {
             alt={safeProduct.name}
             style={{ height: '200px', objectFit: 'cover' }}
             onError={handleImageError}
+            loading="lazy"
           />
         )}
         <div className="card-body">

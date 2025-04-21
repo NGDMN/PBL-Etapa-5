@@ -85,16 +85,17 @@ WSGI_APPLICATION = 'portal_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Verifica o ambiente - se estiver no Vercel, usa SQLite
-if os.environ.get('VERCEL_ENV') or not DEBUG:
+# Verifica o ambiente - se estiver no Vercel, usa SQLite em memória
+if os.environ.get('VERCEL_ENV'):
+    # Use SQLite in-memory para Vercel (readonly filesystem)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+            'NAME': ':memory:',  # usar banco em memória no Vercel
         }
     }
 else:
-    # Configuração para ambiente de desenvolvimento local
+    # Para ambiente de desenvolvimento local
     DATABASES = {
         'default': dj_database_url.config(
             default='sqlite:///db.sqlite3',
