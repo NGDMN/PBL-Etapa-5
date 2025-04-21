@@ -4,15 +4,14 @@
     {
       "src": "backend/portal_api/wsgi.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
+      "config": {
+        "maxLambdaSize": "15mb",
+        "buildCommand": "chmod +x build.sh && ./build.sh"
+      }
     },
     {
-      "src": "portal-apoio-vite/package.json",
-      "use": "@vercel/static-build",
-      "config": { 
-        "distDir": "dist",
-        "buildCommand": "cd portal-apoio-vite && npm install && npm run build"
-      }
+      "src": "portal-apoio-vite/dist/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -21,23 +20,12 @@
       "dest": "backend/portal_api/wsgi.py"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "/portal-apoio-vite/public/static/$1"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/portal-apoio-vite/public/images/$1"
-    },
-    {
-      "src": "/assets/(.*)",
-      "dest": "/portal-apoio-vite/dist/assets/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/portal-apoio-vite/dist/index.html"
+      "dest": "portal-apoio-vite/dist/$1"
     }
-  ]
+  ],
+  "env": {
+    "PYTHON_VERSION": "3.11",
+    "DJANGO_SETTINGS_MODULE": "portal_api.settings"
+  }
 } 
