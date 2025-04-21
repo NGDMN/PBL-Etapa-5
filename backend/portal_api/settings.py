@@ -158,8 +158,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://pbl-etapa-5.vercel.app",
+    "https://front-sable-five.vercel.app",
+    "https://frontend-nu-nine-45.vercel.app",
 ]
 
+# Configurações adicionais para CORS
+CORS_ALLOW_ALL_ORIGINS = True  # Permissivo durante desenvolvimento
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -168,6 +172,17 @@ CORS_ALLOW_METHODS = [
     'PATCH',
     'POST',
     'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
 
 REST_FRAMEWORK = {

@@ -16,7 +16,8 @@ const api = axios.create({
   baseURL: `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
+  withCredentials: true // Importante para autenticação baseada em cookie/sessão
 });
 
 // Adiciona o token de autenticação a cada requisição, se disponível
@@ -27,6 +28,9 @@ api.interceptors.request.use(config => {
   }
   console.log('Starting Request:', config);
   return config;
+}, error => {
+  console.error('Request Error:', error);
+  return Promise.reject(error);
 });
 
 // Interceptor para logs de resposta
@@ -36,8 +40,28 @@ api.interceptors.response.use(
     return response;
   },
   error => {
-    console.error('API Error:', error.response || error);
-    throw error;
+    // Informações detalhadas sobre o erro para diagnóstico
+    if (error.response) {
+      // Resposta recebida com status de erro
+      console.error('API Error Response:', {
+        status: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data
+      });
+    } else if (error.request) {
+      // Requisição enviada mas sem resposta
+      console.error('API No Response:', error.request);
+    } else {
+      // Erro durante configuração da requisição
+      console.error('API Request Setup Error:', error.message);
+    }
+    
+    // Erro específico para CORS, comum em ambientes de desenvolvimento
+    if (error.message.includes('Network Error')) {
+      console.error('Possível erro de CORS. Verifique as configurações do servidor.');
+    }
+    
+    return Promise.reject(error);
   }
 );
 
@@ -64,7 +88,13 @@ export const register = async (userData) => {
     }
     
     console.log('Registering user with data:', userData);
-    const response = await api.post('/users/register/', userData);
+    // Adiciona password2 para validação no backend
+    const registerData = {
+      ...userData,
+      password2: userData.password
+    };
+    
+    const response = await api.post('/users/register/', registerData);
     return response.data;
   } catch (error) {
     console.error('Error in register:', error.response?.data || error);

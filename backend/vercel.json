@@ -12,6 +12,14 @@
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/media/(.*)",
+      "dest": "/media/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "portal_api/wsgi.py"
     }
@@ -19,5 +27,16 @@
   "env": {
     "PYTHON_VERSION": "3.11",
     "DJANGO_SETTINGS_MODULE": "portal_api.settings"
-  }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" }
+      ]
+    }
+  ]
 } 

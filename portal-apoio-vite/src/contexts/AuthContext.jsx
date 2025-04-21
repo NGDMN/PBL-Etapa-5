@@ -41,9 +41,9 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (credentials) => {
     try {
-      console.log('Tentando login com:', { email, password });
+      console.log('Tentando login com:', credentials);
       
       // Se estiver usando dados mockados
       if (USE_MOCK_DATA) {
@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
         
         // Simulação de verificação com dados mockados
         const foundUser = MOCK_USERS.find(u => 
-          u.email === email && u.password === password
+          u.username === credentials.username && u.password === credentials.password
         );
         
         if (foundUser) {
@@ -66,10 +66,10 @@ export function AuthProvider({ children }) {
           navigate('/marketplace');
           return { success: true };
         } else {
-          setError('Email ou senha inválidos');
+          setError('Nome de usuário ou senha inválidos');
           return {
             success: false,
-            error: 'Email ou senha inválidos'
+            error: 'Nome de usuário ou senha inválidos'
           };
         }
       } 
@@ -79,8 +79,8 @@ export function AuthProvider({ children }) {
         
         try {
           const response = await axios.post(`${API_URL}/api/users/login/`, {
-            email,
-            password
+            username: credentials.username,
+            password: credentials.password
           });
           
           console.log('Login response:', response.data);
@@ -95,10 +95,10 @@ export function AuthProvider({ children }) {
           return { success: true };
         } catch (apiError) {
           console.error('Erro na API de login:', apiError);
-          setError(apiError.response?.data?.message || 'Email ou senha inválidos');
+          setError(apiError.response?.data?.message || 'Nome de usuário ou senha inválidos');
           return {
             success: false,
-            error: apiError.response?.data?.message || 'Email ou senha inválidos'
+            error: apiError.response?.data?.message || 'Nome de usuário ou senha inválidos'
           };
         }
       }
@@ -154,7 +154,13 @@ export function AuthProvider({ children }) {
         console.log('Conectando ao backend em:', `${API_URL}/api/users/register/`);
         
         try {
-          const response = await axios.post(`${API_URL}/api/users/register/`, userData);
+          // Adicionar campo password2 para validação no backend
+          const registerData = {
+            ...userData,
+            password2: userData.password
+          };
+          
+          const response = await axios.post(`${API_URL}/api/users/register/`, registerData);
           console.log('Registro response:', response.data);
           
           setError(null);

@@ -21,6 +21,7 @@ const LoginForm = ({ onSubmit, error }) => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
+          autoComplete="username"
         />
       </Form.Group>
 
@@ -31,6 +32,7 @@ const LoginForm = ({ onSubmit, error }) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          autoComplete="current-password"
         />
       </Form.Group>
 
