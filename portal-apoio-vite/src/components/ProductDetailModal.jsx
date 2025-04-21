@@ -13,15 +13,19 @@ const ProductDetailModal = ({ product, show, onHide }) => {
   };
 
   const formatPrice = (price) => {
-    if (typeof price === 'number') {
-      return price.toFixed(2);
+    // Converte para número e verifica se é válido
+    const numericPrice = Number(price);
+    if (!isNaN(numericPrice) && isFinite(numericPrice)) {
+      return numericPrice.toFixed(2);
     }
     return '0.00';
   };
 
   const formatRating = (rating) => {
-    if (typeof rating === 'number') {
-      return rating.toFixed(1);
+    // Converte para número e verifica se é válido
+    const numericRating = Number(rating);
+    if (!isNaN(numericRating) && isFinite(numericRating)) {
+      return numericRating.toFixed(1);
     }
     return '0.0';
   };

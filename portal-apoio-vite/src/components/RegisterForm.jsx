@@ -76,15 +76,30 @@ const RegisterForm = ({ onSubmit, error }) => {
       
       if (!result.success) {
         if (result.error) {
-          // Se o erro for um objeto, converte para string
-          const errorMessage = typeof result.error === 'object' 
-            ? Object.entries(result.error).map(([key, value]) => `${key}: ${value}`).join('\n')
-            : result.error;
-          
-          setValidationErrors(prev => ({
-            ...prev,
-            form: errorMessage
-          }));
+          // Se o erro for uma string, usa diretamente
+          if (typeof result.error === 'string') {
+            setValidationErrors(prev => ({
+              ...prev,
+              form: result.error
+            }));
+          } else {
+            // Se for um objeto, tenta extrair mensagens específicas por campo
+            const fieldErrors = {};
+            Object.entries(result.error).forEach(([key, value]) => {
+              if (formData.hasOwnProperty(key)) {
+                fieldErrors[key] = Array.isArray(value) ? value[0] : value;
+              } else {
+                fieldErrors.form = fieldErrors.form 
+                  ? `${fieldErrors.form}\n${key}: ${value}` 
+                  : `${key}: ${value}`;
+              }
+            });
+            
+            setValidationErrors(prev => ({
+              ...prev,
+              ...fieldErrors
+            }));
+          }
         }
       }
     } catch (err) {

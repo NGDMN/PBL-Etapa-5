@@ -14,6 +14,15 @@ const CartModal = () => {
     checkout
   } = useCart();
 
+  const formatPrice = (price) => {
+    // Converte para número e verifica se é válido
+    const numericPrice = Number(price);
+    if (!isNaN(numericPrice) && isFinite(numericPrice)) {
+      return numericPrice.toFixed(2);
+    }
+    return '0.00';
+  };
+
   if (cartItems.length === 0) {
     return (
       <Modal show={isCartOpen} onHide={() => setIsCartOpen(false)}>
@@ -48,7 +57,7 @@ const CartModal = () => {
               {cartItems.map(item => (
                 <tr key={item.id}>
                   <td>{item.name}</td>
-                  <td>R$ {item.price.toFixed(2)}</td>
+                  <td>R$ {formatPrice(item.price)}</td>
                   <td>
                     <div className="d-flex align-items-center">
                       <button
@@ -66,7 +75,7 @@ const CartModal = () => {
                       </button>
                     </div>
                   </td>
-                  <td>R$ {(item.price * item.quantity).toFixed(2)}</td>
+                  <td>R$ {formatPrice(item.price * item.quantity)}</td>
                   <td>
                     <button
                       className="btn btn-sm btn-danger"
@@ -81,7 +90,7 @@ const CartModal = () => {
           </table>
         </div>
         <div className="d-flex justify-content-between align-items-center mt-3">
-          <h4>Total: R$ {getCartTotal().toFixed(2)}</h4>
+          <h4>Total: R$ {formatPrice(getCartTotal())}</h4>
           <button className="btn btn-success" onClick={checkout}>
             Finalizar Compra
           </button>

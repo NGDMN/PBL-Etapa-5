@@ -42,23 +42,36 @@ export const AuthProvider = ({ children }) => {
       setUser(user);
       localStorage.setItem('token', token);
       setError(null);
-      return true;
+      return { success: true, data: response.data };
     } catch (err) {
-      console.error('Erro no registro:', err.response?.data);
+      console.error('Erro no registro:', err);
+      
       if (err.response?.data) {
-        // Se o erro é um objeto, converte para string
+        let errorMessage;
+        
         if (typeof err.response.data === 'object') {
-          const errorMessages = Object.entries(err.response.data)
-            .map(([key, value]) => `${key}: ${value}`)
-            .join('\n');
-          setError(errorMessages);
+          if (err.response.data.detail) {
+            errorMessage = err.response.data.detail;
+          } else {
+            errorMessage = Object.entries(err.response.data)
+              .map(([key, value]) => {
+                if (Array.isArray(value)) {
+                  return `${key}: ${value.join(', ')}`;
+                }
+                return `${key}: ${value}`;
+              })
+              .join('\n');
+          }
         } else {
-          setError(err.response.data);
+          errorMessage = err.response.data;
         }
-      } else {
-        setError('Erro ao conectar com o servidor. Por favor, tente novamente.');
+        
+        setError(errorMessage);
+        return { success: false, error: errorMessage };
       }
-      return false;
+      
+      setError('Erro ao conectar com o servidor. Por favor, tente novamente.');
+      return { success: false, error: 'Erro ao conectar com o servidor. Por favor, tente novamente.' };
     }
   };
 

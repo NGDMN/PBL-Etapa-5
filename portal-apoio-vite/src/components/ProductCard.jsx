@@ -15,8 +15,10 @@ const ProductCard = ({ product }) => {
   }
 
   const formatPrice = (price) => {
-    if (typeof price === 'number') {
-      return price.toFixed(2);
+    // Converte para número e verifica se é válido
+    const numericPrice = Number(price);
+    if (!isNaN(numericPrice) && isFinite(numericPrice)) {
+      return numericPrice.toFixed(2);
     }
     return '0.00';
   };
