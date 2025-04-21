@@ -22,6 +22,11 @@ const Home = () => {
             Acessar PV da etapa 5
           </a>
         </div>
+        <div className="col-12 col-md-4 mb-3">
+          <a href="https://www.youtube.com/watch?v=IbdR3eHRYIk" className="btn btn-primary btn-block">
+            Acessar PV da etapa 6
+          </a>
+        </div>
       </div>
     </section>
   );
