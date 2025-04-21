@@ -2,30 +2,38 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/portal_api/wsgi.py",
+      "src": "backend/wsgi.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "buildCommand": "chmod +x build.sh && ./build.sh"
+        "runtime": "python3.11"
       }
     },
     {
-      "src": "portal-apoio-vite/dist/**",
-      "use": "@vercel/static"
+      "src": "portal-apoio-vite/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "/portal-apoio-vite/dist/static/$1"
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "backend/portal_api/wsgi.py"
+      "dest": "/backend/wsgi.py"
     },
     {
       "src": "/(.*)",
-      "dest": "portal-apoio-vite/dist/$1"
+      "dest": "/portal-apoio-vite/dist/$1"
     }
   ],
   "env": {
     "PYTHON_VERSION": "3.11",
-    "DJANGO_SETTINGS_MODULE": "portal_api.settings"
+    "DJANGO_SETTINGS_MODULE": "portal_api.settings",
+    "NODE_ENV": "production"
   }
 } 
