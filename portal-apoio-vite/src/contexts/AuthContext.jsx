@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(userData);
       setError(null);
-      navigate('/dashboard');
+      navigate('/marketplace');
       return { success: true };
     } catch (error) {
       console.error('Erro no login:', error);
@@ -64,16 +64,18 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     try {
-      console.log('Registering at:', `${API_URL}/api/auth/register`);
-      const response = await axios.post(`${API_URL}/api/auth/register`, userData);
+      console.log('Registering at:', `${API_URL}/api/users/register/`);
+      console.log('User data:', userData);
+      const response = await axios.post(`${API_URL}/api/users/register/`, userData);
+      console.log('Registration response:', response.data);
       setError(null);
       return { success: true, data: response.data };
     } catch (error) {
       console.error('Erro no registro:', error);
-      setError(error.response?.data?.message || 'Erro ao registrar usuário');
+      setError(error.response?.data || 'Erro ao registrar usuário');
       return {
         success: false,
-        error: error.response?.data?.message || 'Erro ao registrar usuário'
+        error: error.response?.data || 'Erro ao registrar usuário'
       };
     }
   };
