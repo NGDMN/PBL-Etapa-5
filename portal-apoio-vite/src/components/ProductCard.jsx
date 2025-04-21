@@ -7,12 +7,19 @@ const ProductCard = ({ product }) => {
 
   const handleImageError = () => {
     setImgError(true);
-    console.error(`Erro ao carregar imagem para o produto: ${product.name}`);
+    console.error(`Erro ao carregar imagem para o produto: ${product?.name}`);
   };
 
   if (!product) {
     return null;
   }
+
+  const formatPrice = (price) => {
+    if (typeof price === 'number') {
+      return price.toFixed(2);
+    }
+    return '0.00';
+  };
 
   return (
     <>
@@ -30,17 +37,17 @@ const ProductCard = ({ product }) => {
           </div>
         ) : (
           <img
-            src={product.image}
+            src={product.image || '/placeholder-image.jpg'}
             className="card-img-top"
-            alt={product.name}
+            alt={product.name || 'Produto'}
             style={{ height: '200px', objectFit: 'cover' }}
             onError={handleImageError}
           />
         )}
         <div className="card-body">
-          <h5 className="card-title">{product.name}</h5>
-          <p className="card-text mb-0">R$ {product.price.toFixed(2)}</p>
-          <small className="text-muted">Estoque: {product.stock} unidades</small>
+          <h5 className="card-title">{product.name || 'Produto sem nome'}</h5>
+          <p className="card-text mb-0">R$ {formatPrice(product.price)}</p>
+          <small className="text-muted">Estoque: {product.stock || 0} unidades</small>
         </div>
       </div>
 
