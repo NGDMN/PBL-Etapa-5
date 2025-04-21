@@ -2,60 +2,33 @@ import React, { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import CartModal from '../components/CartModal';
 import { useCart } from '../context/CartContext';
+import { getProducts } from '../services/api';
 
 const Marketplace = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const products = [
-    {
-      id: 1,
-      name: 'Arroz',
-      price: 25.90,
-      stock: 50,
-      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=300',
-      description: 'Arroz branco de alta qualidade'
-    },
-    {
-      id: 2,
-      name: 'Leite',
-      price: 4.50,
-      stock: 100,
-      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300',
-      description: 'Leite integral fresco'
-    },
-    {
-      id: 3,
-      name: 'Café',
-      price: 15.90,
-      stock: 30,
-      image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=300',
-      description: 'Café torrado e moído'
-    }
-  ];
+  const [products, setProducts] = useState([]);
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   useEffect(() => {
-    try {
-      setLoading(true);
-      // Verificar se as imagens existem
-      products.forEach(product => {
-        const img = new Image();
-        img.src = product.image;
-        img.onerror = () => {
-          console.error(`Erro ao carregar imagem: ${product.image}`);
-        };
-      });
-    } catch (err) {
-      setError('Erro ao carregar produtos');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProducts();
+        setProducts(data);
+      } catch (err) {
+        setError('Erro ao carregar produtos');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   return (
