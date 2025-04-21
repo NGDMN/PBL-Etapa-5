@@ -85,14 +85,23 @@ WSGI_APPLICATION = 'portal_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgres://portal_user:sPass!Word1@localhost:5432/portal_agricultura',
-        conn_max_age=600,
-        conn_health_checks=True,
-        ssl_require=True,
-    )
-}
+# Verifica o ambiente - se estiver no Vercel, usa SQLite
+if os.environ.get('VERCEL_ENV') or not DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+else:
+    # Configuração para ambiente de desenvolvimento local
+    DATABASES = {
+        'default': dj_database_url.config(
+            default='sqlite:///db.sqlite3',
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 
 # Adicione isto para log de SQL em produção para ajudar a diagnosticar problemas
 if not DEBUG:

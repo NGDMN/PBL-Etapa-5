@@ -69,30 +69,6 @@ export const MOCK_PRODUCTS = [
     unit: 'kg'
   },
   {
-    id: 5,
-    name: 'Arroz Branco',
-    description: 'Arroz branco de alta qualidade, grãos selecionados e saborosos.',
-    price: 7.99,
-    image: 'https://images.unsplash.com/photo-1586201375761-83865001e8ac?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-    category: 'Grãos',
-    stock: 35,
-    farmer: 'Cooperativa Rural',
-    average_rating: 4.4,
-    unit: 'kg'
-  },
-  {
-    id: 6,
-    name: 'Café Norte do Paraná Torra Média, em Grãos',
-    description: 'Café especial do norte do Paraná, com torra média e grãos selecionados, ideal para amantes de café.',
-    price: 29.90,
-    image: 'https://images.unsplash.com/photo-1518057111178-44a106bad636?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
-    category: 'Produtos Naturais',
-    stock: 15,
-    farmer: 'Fazenda Café do Campo',
-    average_rating: 4.9,
-    unit: '500g'
-  },
-  {
     id: 7,
     name: 'Ovos Caipira',
     description: 'Ovos caipiras de galinhas criadas ao ar livre, com alimentação natural.',
