@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // Verificar se devemos usar dados mockados
-const USE_MOCK_DATA = import.meta.env.USE_MOCK_DATA === 'true';
+const USE_MOCK_DATA = true; // Forçando o uso de dados mockados
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 console.log('AuthContext: ', { 

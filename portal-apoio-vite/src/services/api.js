@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { MOCK_PRODUCTS } from '../data/mockData';
 
-// Verificar se devemos usar dados mockados
-const USE_MOCK_DATA = import.meta.env.USE_MOCK_DATA === 'true';
+// Verificar se devemos usar dados mockados - forçar para true para garantir
+const USE_MOCK_DATA = true; // Forçando o uso de dados mockados atualizados
 
 // URL da API baseada no ambiente
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -69,7 +69,7 @@ export const submitForm = async (formData) => {
   try {
     if (USE_MOCK_DATA) {
       console.log('Mock: submitForm', formData);
-      return { message: 'Formulário enviado com sucesso' };
+      return { success: true, message: 'Formulário enviado com sucesso' };
     }
     
     const response = await api.post('/contact/submit/', formData);
@@ -106,7 +106,7 @@ export const login = async (credentials) => {
   try {
     if (USE_MOCK_DATA) {
       console.log('Mock: login', credentials);
-      return { token: 'mock-token', user: { id: 1, username: 'mock_user' } };
+      return { success: true, token: 'mock-token', user: { id: 1, username: 'mock_user' } };
     }
     
     const response = await api.post('/users/login/', credentials);

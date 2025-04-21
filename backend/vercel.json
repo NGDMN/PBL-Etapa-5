@@ -10,23 +10,15 @@
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/media/(.*)",
-      "dest": "/media/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "portal_api/wsgi.py"
-    }
+  "rewrites": [
+    { "source": "/static/(.*)", "destination": "/static/$1" },
+    { "source": "/media/(.*)", "destination": "/media/$1" },
+    { "source": "/(.*)", "destination": "portal_api/wsgi.py" }
   ],
   "env": {
     "PYTHON_VERSION": "3.11",
-    "DJANGO_SETTINGS_MODULE": "portal_api.settings"
+    "DJANGO_SETTINGS_MODULE": "portal_api.settings",
+    "NODE_ENV": "production"
   },
   "headers": [
     {
