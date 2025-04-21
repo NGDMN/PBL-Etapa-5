@@ -18,23 +18,11 @@
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/portal-apoio-vite/dist/static/$1"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/backend/portal_api/wsgi.py"
-    },
-    {
-      "src": "/(.*\\.[^/]*)",
-      "dest": "/portal-apoio-vite/dist/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/portal-apoio-vite/dist/index.html"
-    }
+  "rewrites": [
+    { "source": "/static/(.*)", "destination": "/portal-apoio-vite/dist/static/$1" },
+    { "source": "/api/(.*)", "destination": "/backend/portal_api/wsgi.py" },
+    { "source": "/(.*\\.[^/]*)", "destination": "/portal-apoio-vite/dist/$1" },
+    { "source": "/(.*)", "destination": "/portal-apoio-vite/dist/index.html" }
   ],
   "env": {
     "PYTHON_VERSION": "3.11",
