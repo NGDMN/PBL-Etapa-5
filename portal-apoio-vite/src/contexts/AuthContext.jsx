@@ -64,9 +64,9 @@ export function AuthProvider({ children }) {
 
   const register = async (userData) => {
     try {
-      console.log('Registering at:', `${API_URL}/api/users/register/`);
+      console.log('Registering at:', `${API_URL}/users/register/`);
       console.log('User data:', userData);
-      const response = await axios.post(`${API_URL}/api/users/register/`, userData);
+      const response = await axios.post(`${API_URL}/users/register/`, userData);
       console.log('Registration response:', response.data);
       setError(null);
       return { success: true, data: response.data };
