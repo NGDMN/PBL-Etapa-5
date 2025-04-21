@@ -63,7 +63,9 @@ export const login = async (credentials) => {
 
 export const getProducts = async () => {
   try {
+    console.log('Fetching products from:', `${API_URL}/api/products`);
     const response = await api.get('/products');
+    console.log('Products response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error in getProducts:', error.response?.data || error);
@@ -73,7 +75,9 @@ export const getProducts = async () => {
 
 export const getProductDetails = async (id) => {
   try {
+    console.log('Fetching product details for ID:', id);
     const response = await api.get(`/products/${id}`);
+    console.log('Product details response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error in getProductDetails:', error.response?.data || error);
