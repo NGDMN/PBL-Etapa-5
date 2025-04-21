@@ -77,7 +77,12 @@ const RegisterForm = ({ onSubmit }) => {
       setSubmitError(null);
       
       const { confirmPassword, ...userData } = formData;
-      const result = await onSubmit(userData);
+      const dataToSubmit = {
+        ...userData,
+        password2: formData.confirmPassword
+      };
+      
+      const result = await onSubmit(dataToSubmit);
       
       if (!result.success) {
         if (result.error) {
